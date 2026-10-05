@@ -1,0 +1,16 @@
+node_modules/
+.next/
+.env.local
+.test-out/
+
+# Local verification artefacts (browser screenshots + reports produced by scripts/verify-browser.mjs)
+browser-shots/
+*.log
+verify-out.txt
+*-verify.txt
+.verify/
+.probe/
+.probe-*/
+.acceptance*/
+/.teaching-verify*/
+.tv-check/

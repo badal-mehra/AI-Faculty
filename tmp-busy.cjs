@@ -1,0 +1,10 @@
+﻿const { buildPrompt } = require("./.test-out/lib/teaching/prompt");
+const { measureRequest, TOKEN_BUDGET } = require("./.test-out/lib/teaching/budget");
+const { buildLessonObjective, resumeLessonProgress } = require("./.test-out/lib/teaching/objective");
+const { emptyVisual3DScene } = require("./.test-out/lib/visual3d/types");
+const { geminiTeachingLessonSchema } = require("./.test-out/lib/teaching/providers/gemini");
+const schema = JSON.stringify(geminiTeachingLessonSchema);
+const busy = { ...emptyVisual3DScene(), objects: Array.from({length:20},(_,i)=>({id:`obj-${i}`,objectKind:"model",type:"model",order:i,position:{x:i,y:i,z:i},rotation:{x:0,y:0,z:0},scale:{x:1,y:1,z:1},radius:1.2,color:"#fff",opacity:1,visible:true,highlight:false,highlightColor:"#ffe66d",castShadow:true,receiveShadow:true,asset:"biology/heart"})) };
+const req = { question: "Explain linked list in C++ from scratch.", language: "English", lessonStep: 9, boardState: { nodes: [], edges: [], texts: [], highlights: [] }, visualState: { objects: [], tick: 0 }, visualState3d: busy, previousTeaching: Array.from({length:12},()=>"a fairly long previous sentence about the lesson in progress") };
+const obj = buildLessonObjective(req); const prog = resumeLessonProgress(obj, undefined);
+console.log("busy:", ["full","compact","minimal"].map(l => l + "=" + measureRequest(...(p=>([p.system,p.user]))(buildPrompt(req,{level:l,objective:obj,progress:prog})), schema).totalTokens).join(" "), "budget", TOKEN_BUDGET);

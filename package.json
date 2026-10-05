@@ -1,0 +1,36 @@
+{
+  "name": "ai-faculty-board",
+  "private": true,
+  "scripts": {
+    "dev": "node ./node_modules/next/dist/bin/next dev",
+    "build": "node ./node_modules/next/dist/bin/next build",
+    "start": "node ./node_modules/next/dist/bin/next start",
+    "test": "tsc -p tsconfig.test.json && node .test-out/tests/visual.test.js && node .test-out/tests/visual3d.test.js && node .test-out/tests/teaching-pipeline.test.js && node .test-out/tests/teaching-alignment.test.js && node .test-out/tests/teaching-pedagogy.test.js && node .test-out/tests/visual-lifecycle.test.js && node .test-out/tests/visual-semantics.test.js && node .test-out/tests/lesson-objective.test.js && node .test-out/tests/board-anchoring.test.js && node .test-out/tests/teaching-taxonomy.test.js && node .test-out/tests/teaching-policy.test.js && node .test-out/tests/visual-composition.test.js",
+    "assets:build": "node scripts/build-assets.mjs",
+    "assets:validate": "node scripts/validate-assets.mjs",
+    "audit:assets": "node scripts/audit-assets.mjs",
+    "verify:browser": "node scripts/verify-browser.mjs",
+    "verify:board": "node scripts/verify-2d-board.mjs",
+    "verify:teaching": "node scripts/verify-lessons.mjs",
+    "probe:lessons": "node scripts/probe-lessons.mjs"
+  },
+  "dependencies": {
+    "@google/genai": "^2.25.0",
+    "@mistralai/mistralai": "^2.7.0",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.1",
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "@types/three": "^0.186.0",
+    "groq-sdk": "^1.6.0",
+    "next": "15.1.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "three": "^0.186.1",
+    "typescript": "5.7.2"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.12.0"
+  }
+}

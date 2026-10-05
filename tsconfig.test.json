@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "outDir": ".test-out",
+    "rootDir": ".",
+    "incremental": false,
+    "jsx": "react-jsx"
+  },
+  "include": [],
+  "files": ["tests/visual.test.ts", "tests/visual3d.test.ts", "tests/teaching-pipeline.test.ts", "tests/teaching-alignment.test.ts", "tests/teaching-pedagogy.test.ts", "tests/visual-lifecycle.test.ts", "tests/visual-semantics.test.ts", "tests/lesson-objective.test.ts", "tests/board-anchoring.test.ts", "tests/teaching-taxonomy.test.ts", "tests/teaching-policy.test.ts", "tests/visual-composition.test.ts"]
+}
+
