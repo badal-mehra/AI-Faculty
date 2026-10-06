@@ -43,14 +43,27 @@ button { font: inherit; }
 .outline-label { min-width: 0; }
 @keyframes pop-in { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: scale(1); } } @keyframes draw-line { from { stroke-dashoffset: 500; } to { stroke-dashoffset: 0; } } @keyframes text-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @keyframes pulse { 50% { transform: scale(1.13); opacity: .05; } }
 @media (max-width: 1050px) { .lesson-layout { grid-template-columns: 1fr; }.teacher-panel { min-height: 0; }.control-groups { grid-template-columns: 1fr 1fr; }.quick-actions { grid-column: span 2; } }
-@media (max-width: 620px) { .classroom { padding: 14px 12px 30px; }.lesson-chip { display: none; }.board-heading > span:last-child { display: none; }.board-canvas { min-height: 290px; }.control-groups { grid-template-columns: 1fr; }.quick-actions { grid-column: auto; }.teacher-panel { padding: 22px; } }
+@media (max-width: 620px) { .classroom { padding: 14px 12px 30px; }.lesson-chip { display: none; }.board-heading > span:last-child { display: none; }.board-canvas { min-height: 290px; }.diagram-board { min-height: 340px; }.control-groups { grid-template-columns: 1fr; }.quick-actions { grid-column: auto; }.teacher-panel { padding: 22px; } }
 
-/* ============================================================================
-   Visual Teaching Engine — 2D Diagram Renderer
-   The Graph renderer keeps its existing .board-* styles; these are the
+/* PHASE 26 — THE DEMO BOARD MUST LOOK LIKE THE CLASSROOM BOARD.
+   A verification run against a page that is not shaped like the real one verifies the wrong thing. The demo
+   page carries `.lesson-layout` and `.board-column` but sits outside `.classroom`'s height chain, so its
+   board collapsed to the `min-height` floor and the check was measuring a 320px strip that no student
+   ever sees. The page is given the same board proportions the classroom has. */
+.demo-board-page { height: 100vh; }
+.demo-board-page .board-column { height: clamp(430px, 66vh, 960px); }
+
+
    generalized diagram primitives + declarative animation keyframes.
    ============================================================================ */
-.diagram-board { position: relative; flex: 1 1 auto; min-height: 0; display: flex; }
+/* PHASE 26 — A BOARD MUST HAVE A FLOOR.
+   The board is a flex child of `.board-shell`, which is itself a flex child of a column with a clamped
+   height. In the classroom the chain works; anywhere else — a demo page, a future embed, a container
+   without the fixed height — the chain has no height to divide and the board collapses to nothing. A
+   browser verification run measured 0px and 9px of board and reported a quality score of 15, which is
+   exactly the kind of failure a unit test cannot see: the arithmetic was right and the screen was empty.
+   A board is a drawing surface, so it is given one. */
+.diagram-board { position: relative; flex: 1 1 auto; min-height: 320px; display: flex; }
 .diagram-canvas { display: block; width: 100%; height: 100%; min-height: 0; background: var(--board-bg, linear-gradient(120deg, #162a31, #101d22)); touch-action: none; cursor: grab; }
 .diagram-canvas.is-panning { cursor: grabbing; }
 .diagram-canvas .is-selectable { cursor: pointer; }

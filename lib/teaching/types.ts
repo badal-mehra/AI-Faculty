@@ -63,6 +63,24 @@ export type LessonQualitySummary = {
   issues: Array<{ kind: string; lessonStep: number; detail: string }>;
 };
 
+/**
+ * What one provider call ACTUALLY consumed, as that provider reported it.
+ *
+ * Deliberately not comparable with the request planner's estimate (`RequestPlan.size.totalTokens`): that
+ * measures how big the outgoing request is before it is sent, this measures what was billed after it
+ * came back, and the two answer different questions. Every field is optional because the three providers
+ * report usage differently and any of them may report none of it — see `lib/teaching/usage.ts` for how
+ * the fields are reduced, and for why an absent report is never turned into a number.
+ */
+export type ProviderTokenUsage = {
+  /** Tokens the provider counted as the request. */
+  inputTokens?: number;
+  /** Tokens the provider counted as the answer. */
+  outputTokens?: number;
+  /** The provider's own total, when it reports one. */
+  totalTokens?: number;
+};
+
 export const TEACHING_LANGUAGES = ["English", "Hinglish", "Hindi", "Telugu", "Tamil", "Kannada", "Malayalam", "Marathi", "Bengali", "Punjabi"] as const;
 export type TeachingLanguage = typeof TEACHING_LANGUAGES[number];
 
@@ -131,6 +149,14 @@ export type TeachingResponse = {
    * why this is one bounded object rather than a dozen top-level fields.
    */
   pedagogy?: PedagogicalBlock;
+  /**
+   * What the provider was actually charged for producing THIS step, when it reported it.
+   *
+   * Attached by the provider from the real response, and summed by the router across the attempts it took
+   * to produce the step. Absent means "the provider did not say", which is displayed as such rather than
+   * filled in from an estimate.
+   */
+  usage?: ProviderTokenUsage;
 };
 
 export type TeachingLessonResponse = {
@@ -142,4 +168,11 @@ export type TeachingLessonResponse = {
    * normal student-facing payload is unchanged.
    */
   quality?: LessonQualitySummary;
+  /**
+   * What the provider was actually charged for this BATCH, when it reported it.
+   *
+   * Batch-level, not per step: a lesson request is one call that happens to return several steps, so
+   * splitting the figure across them would be inventing precision the provider never reported.
+   */
+  usage?: ProviderTokenUsage;
 };

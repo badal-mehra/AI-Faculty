@@ -76,11 +76,11 @@ function diagramVocabulary(level: ContextLevel): string {
   if (level !== "full") {
     return `2) DIAGRAM -> visual_actions. Flows, sequences, comparisons, setups, message exchanges, structures.
 STRUCTURES FIRST: give the STRUCTURE, never coordinates. Cells are addressable afterwards as "<id>-c0","<id>-c1" and boxes as "<id>-<nodeId>".
-create_array{id,values,indices?,title?} | update_array{id,values} | create_linked_list{id,nodes:[{id,value}],doubly?} | create_stack{id,values,topLabel?} | create_queue{id,values,frontLabel?,rearLabel?} | create_tree{id,nodes,edges:[{from,to}]} | create_graph{id,nodes,edges,layout?:"grid"|"circle"|"layered"} | create_sequence{id,actors:[name],messages:[{from:ActorName,to:ActorName,label}]} | create_pipeline{id,stages:[name]} | create_timeline{id,events:[{label,text}]} | create_compare{id,left:{title,items},right:{title,items}}
+create_array{id,values,indices?,title?} | update_array{id,values} | create_linked_list{id,nodes:[{id,value}],doubly?} | create_stack{id,values,topLabel?} | create_queue{id,values,frontLabel?,rearLabel?} | create_tree{id,nodes,edges:[{from,to}]} | create_graph{id,nodes,edges,layout?:"grid"|"circle"|"layered"} | create_sequence{id,actors:[name],messages:[{from:ActorName,to:ActorName,label}]} | create_pipeline{id,stages:[name]} | create_timeline{id,items:[{id?,label,text?}],orientation?} | create_compare{id,left:{title,items},right:{title,items}}
 NEVER fake a structure with hand-placed boxes. Reveal it across steps, then highlight one part per sentence.
 create_shape{id,shape,semantic?,text?} | create_container | create_icon{id,glyph} | create_text{id,text,size?,role?} | create_label{id,target,text,side?} | write_formula{id,formula} | create_code_block{id,code,language?,title?,highlightLines?} | set_code_pointer{id,lines}
 create_arrow{id,from,to,label?,style?,kind?} | create_connector{id,from,to,label?,kind?} | move | resize | rotate | highlight | highlight_many{ids} | focus{ids} | dim{ids} | restore | pulse | fade_in | fade_out | flow{id} | animate_path{id,to} | remove | clear | wait{durationMs} | set_theme{theme}
-Placement2D is ONE of {"kind":"anchor","anchor":(...)}, {"kind":"relative","relativeTo":id,"side":(...)}, {"kind":"between","between":[id,id]}, {"kind":"point","x":y":number}. Any diagram action may add "animate":{"kind":(...),"durationMs":number<=8000}.`;
+Placement2D is ONE of {"kind":"anchor","anchor":(...)}, {"kind":"relative","relativeTo":id,"side":(...)}, {"kind":"between","between":[id,id]}, {"kind":"point","x":y":number}. Any diagram action may add "animate":{"kind":("appear"|"disappear"|"move"|"highlight"|"draw"|"draw_connector"|"flow"|"travel"|"insert"|"remove"|"reorder"|"compare"|"substitute"|"eliminate"|"trace"|"transform"),"durationMs":number<=8000}. Animate the CHANGE: "eliminate", "substitute", "move", "insert", "remove".`;
   }
   return `2) DIAGRAM -> visual_actions. Flows, sequences, comparisons, setups, message exchanges, structures.
 STRUCTURES FIRST. When the idea IS a structure, name it and let the board place everything — you give the STRUCTURE, never the coordinates. Cells are addressable afterwards by their deterministic ids (array cells "<id>-c0","<id>-c1"; boxes "<id>-<nodeId>"; edges "<id>-edge0"), so you can point at one in a later step:
@@ -88,14 +88,15 @@ create_array{id,values,indices?,title?} | update_array{id,values} — insertion,
 create_linked_list{id,nodes:[{id,value}],head?,tail?,doubly?} | create_stack{id,values,topLabel?} | create_queue{id,values,frontLabel?,rearLabel?}
 create_tree{id,nodes,edges:[{from,to}]} | create_graph{id,nodes,edges,layout?:"grid"|"circle"|"layered"}
 create_sequence{id,actors:[name],messages:[{from:ActorName,to:ActorName,label}]} — TCP handshake, HTTP, protocols, lifecycles
-create_pipeline{id,stages:[name]} | create_timeline{id,events:[{label,text}]} | create_compare{id,left:{title,items},right:{title,items}}
+create_pipeline{id,stages:[name]} | create_timeline{id,items:[{id?,label,text?}],orientation?:"horizontal"|"vertical",title?} | create_compare{id,left:{title,items},right:{title,items}}
+A timeline mark is NAMED: "label" is the phase name, "text" is what happens in it (optional — five framework phases usually want the five names alone), and "id" is what makes that phase addressable later by "highlight".
 NEVER fake a structure with hand-placed boxes: an array is create_array, a stack is create_stack, a tree is create_tree. Reveal it across steps (build it, then highlight/focus one part per sentence), never dump the whole diagram at once.
 Primitives when no structure fits: create_shape{id,shape,semantic?,text?,width?,height?} | create_container | create_icon{id,glyph} | create_text{id,text,size?,role?:"title"|"subtitle"|"primary"|"secondary"|"annotation"|"caption"|"callout"|"step"} | create_label{id,target,text,side?} | write_formula{id,formula}
 create_code_block{id,code,language?,title?,highlightLines?} — ACTUAL SOURCE as a numbered, syntax-coloured listing with the explained line lit. Use it for every code or pseudo-code stage; write_formula is for MATHS ("F = ma", "mean = 25.5"), never for code. Keep code to about 12 short lines (about 40 characters each) with its real indentation, and set highlightLines to the 1-based lines you are explaining.
 set_code_pointer{id,lines} — MOVE the execution pointer on an existing code block, so "now line three" moves the highlight instead of redrawing the listing.
 create_arrow{id,from,to,label?,style?:"solid"|"dashed"|"dotted",kind?:"straight"|"curved"|"elbow"|"bidirectional"|"parent_child"|"next_pointer"|"dependency"|"flow"|"pointer"} | create_connector{id,from,to,label?,kind?}
 move{id,placement} | resize | rotate | highlight | highlight_many{ids} | focus{ids} — point at what you are saying and subdue the rest | dim{ids} / restore — an eliminated half, an already-visited node | pulse | fade_in | fade_out | flow{id} — a packet travelling along a connector | animate_path{id,to} | remove | clear | wait{durationMs} | set_theme{theme:"computer-science"|"mathematics"|"physics"|"biology"|"chemistry"|"history"|"general"}
-Placement2D is ONE of {"kind":"anchor","anchor":("center"|"top"|"bottom"|"left"|"right"|"top_left"|"top_right"|"bottom_left"|"bottom_right")}, {"kind":"relative","relativeTo":string,"side":("left"|"right"|"above"|"below"),"gap"?:number}, {"kind":"between","between":[string,string]}, {"kind":"point","x":number,"y":number}. Any diagram action may add "animate":{"kind":("appear"|"disappear"|"move"|"pulse"|"highlight"|"travel"|"fade"|"draw"|"flow"|"dim"|"spotlight"|"expand"|"collapse"|"rotate"),"durationMs":number<=8000,"delayMs"?:number}.`;
+Placement2D is ONE of {"kind":"anchor","anchor":("center"|"top"|"bottom"|"left"|"right"|"top_left"|"top_right"|"bottom_left"|"bottom_right")}, {"kind":"relative","relativeTo":string,"side":("left"|"right"|"above"|"below"),"gap"?:number}, {"kind":"between","between":[string,string]}, {"kind":"point","x":number,"y":number}. Any diagram action may add "animate":{"kind":("appear"|"disappear"|"move"|"highlight"|"draw"|"draw_connector"|"flow"|"travel"|"insert"|"remove"|"reorder"|"compare"|"substitute"|"eliminate"|"trace"|"transform"),"durationMs":number<=8000,"delayMs"?:number}. Animate the CHANGE, not the arrival: "eliminate" for the half a search discards, "substitute" for the term a derivation replaces, "move" for a boundary or pointer that shifts, "insert"/"remove" for a value entering or leaving a structure.`;
 }
 
 /** The 3D action contract, in two sizes — same rule as the 2D one. */
@@ -363,25 +364,48 @@ function representationPolicyLine(objective: LessonObjective, context: ContextLe
     : `REPRESENTATION POLICY (domain=${policy.domain}, subject=${policy.coarse}): ${policy.guidance} Available: ${allowed}.${noCode}`;
 }
 
+/**
+ * The DOMAIN'S OWN VISUAL VOCABULARY, stated with the payload each structure actually reads.
+ *
+ * PHASE 13, and this function used to name four structures whose payloads it either omitted or got wrong.
+ * That is worse than not mentioning them: a model told to send `create_free_body_diagram{name, direction}`
+ * sends exactly that, the validator looks for `forces`, finds nothing, and the lesson produces an empty
+ * diagram that is logged as "malformed". The shapes below are copied from what `parseVisualAction` reads,
+ * so the model is told the truth and the truth is what the engine accepts.
+ *
+ * The names are domain-specific on purpose. "Continuity of a function" is mathematics because the SUBJECT
+ * says so, and mathematics gets equations, curves and derivations — never a linked list, whatever words
+ * appear in the question.
+ */
 function subjectDomainRules(subject: TeachingSubject, families: VisualFamilies, objective: LessonObjective, context: ContextLevel): string {
-  const twoD: string[] = [];
+  const terse = context === "minimal";
+  const lines: string[] = [];
+
   if (subject === "mathematics" || subject === "physics" || subject === "chemistry" || subject === "engineering" || subject === "general") {
-    twoD.push("a formula or its symbols -> create_equation_block (put the formula and every symbol in ONE action; the board then shows them together)");
+    lines.push(terse
+      ? "a formula and its symbols -> create_equation_block{id,variables:[{symbol,meaning,unit?}],calculates?}"
+      : "a formula or its symbols -> create_equation_block{id,variables:[{symbol,meaning,unit?}],calculates?} — ONE action holding the formula AND every symbol, so the board shows them together and the student can see which term is which. `calculates` is the result it evaluates to.");
   }
   if (subject === "physics" || subject === "mathematics" || subject === "general") {
-    twoD.push("the forces acting on a body -> create_free_body_diagram{name,direction,magnitude,acts}; on a distance-time, velocity-time or exponential curve -> create_graph_plot{points,xLabel,yLabel}");
+    lines.push(terse
+      ? "forces on a body -> create_free_body_diagram{id,body?,forces:[{name,direction,magnitude?,acts?}]}"
+      : "the forces acting on a body -> create_free_body_diagram{id,body?,forces:[{name,direction:\"up\"|\"down\"|\"left\"|\"right\",magnitude?,acts?:\"centre\"|\"surface\"}],motion?:{label,direction}} — ONE force per entry in `forces`, NOT at the top level; `motion` is the velocity/acceleration arrow if the body is moving");
   }
   // Engineering gets the circuit, and it gets the curve: "the capacitor voltage rises exponentially" is
   // the whole point of a transient-response lesson and it is a graph, not a paragraph.
   if (subject === "engineering" || subject === "general" || subject === "physics" || subject === "chemistry") {
-    twoD.push("a worked sequence of values -> create_array; an ordered process -> create_pipeline; a curve of anything over time -> create_graph_plot{points,xLabel,yLabel}");
+    lines.push(terse
+      ? "a curve of anything over time -> create_graph_plot{id,points:[{x,y,label?}],xLabel,yLabel}"
+      : "a curve of anything over time -> create_graph_plot{id,points:[{x,y,label?}],xLabel?,yLabel?,shape?} — `shape` is the NAME of the curve (\"sin(x)\", \"v = u\"), and `guide:{y,label}` adds a reference line such as an asymptote. A worked sequence of values -> create_array; an ordered process -> create_pipeline");
   }
-  if (twoD.length === 0) return `Use the structure whose shape matches what this step teaches; never assemble a structure out of loose boxes.\n${representationPolicyLine(objective, context)}`;
+  if (lines.length === 0) return `Use the structure whose shape matches what this step teaches; never assemble a structure out of loose boxes.\n${representationPolicyLine(objective, context)}`;
   const circuit = subject === "engineering" || subject === "physics" || subject === "chemistry" || subject === "general"
-    ? " For a circuit, the components in the order current passes -> create_circuit{elements:[{label,kind,value}]}."
+    ? terse
+      ? " a circuit -> create_circuit{id,elements:[{label,kind,value}]}"
+      : " A circuit, with the components in the order current passes them -> create_circuit{id,elements:[{label,kind,value}],current?}. `kind` is one of resistor, capacitor, inductor, source, battery, switch, diode, opamp, ground."
     : "";
-  return `STRUCTURES: ${twoD.join("; ")}.${circuit}`
-    + (families.scene3d ? " A circuit drawn in 3D is a free-body-style spatial arrangement, not a schematic; prefer the 2D structure." : "")
+  return `STRUCTURES: ${lines.join("; ")}.${circuit}`
+    + (families.scene3d && !terse ? " A circuit drawn in 3D is a free-body-style spatial arrangement, not a schematic; prefer the 2D structure." : "")
     + `\n${representationPolicyLine(objective, context)}`;
 }
 
@@ -465,6 +489,14 @@ export type BuiltPrompt = {
    * educational gate reads this rather than re-deriving it.
    */
   representation: "2d" | "3d";
+  /**
+   * The action families this prompt actually documented.
+   *
+   * Published because the wire schema has to be scoped to the SAME set. A schema that declares an array
+   * the prompt never described is not free headroom — it is a contradiction the model resolves by guessing,
+   * and with `additionalProperties: false` the guess is a rejection rather than a stray field.
+   */
+  families: VisualFamilies;
   stateChars: number;
   speechChars: number;
 };
@@ -586,6 +618,10 @@ ${objectiveSection(objective, progress, level, request.lessonStep)}`;
     recentSpeech: speech,
     level,
     representation: families.scene3d ? "3d" : "2d",
+    // The families the prompt documented, so the batch instruction and the wire schema can be scoped to
+    // exactly the same set. A prompt that names an array the schema omits is a contradiction the model has
+    // to resolve, and it resolves it by sending something the gate then deletes.
+    families,
     stateChars: stateJson.length,
     speechChars: speechJson.length,
   };
@@ -631,7 +667,22 @@ export function representationForRequest(request: TeachingRequest, subject: stri
   });
 }
 
-const LESSON_INSTRUCTIONS = `Generate the consecutive steps requested in section F, starting at "startingLessonStep". Each step is one JSON object: {"speech": string, "board_actions": [], "visual_actions": [], "visual3d_actions": [], "lesson_step": number, "next_step": number, "stage_id": string}. Preserve the supplied state across the sequence and keep ids stable so the scene builds up instead of restarting. Set "next_step" = "lesson_step"+1 on every step, including the last one of this batch: the batch is not the lesson, and the app requests the next part itself until the objective is covered.`;
+/**
+ * The batch instruction, naming ONLY the action arrays this lesson actually has.
+ *
+ * PHASE 13/12. It used to name all three unconditionally, which contradicted a family-scoped schema: the
+ * model was told to fill a `visual3d_actions` array the schema did not contain, and the app then had to
+ * delete whatever arrived in it. Naming what exists also saves tokens, which is the same budget the schema
+ * just freed up.
+ */
+const lessonInstructionsFor = (families: VisualFamilies): string => {
+  const arrays = [
+    families.graph ? '"board_actions": []' : null,
+    families.diagram ? '"visual_actions": []' : null,
+    families.scene3d ? '"visual3d_actions": []' : null,
+  ].filter(Boolean).join(", ");
+  return `Generate the consecutive steps requested in section F, starting at "startingLessonStep". Each step is one JSON object: {"speech": string, ${arrays}, "lesson_step": number, "next_step": number, "stage_id": string}. Preserve the supplied state across the sequence and keep ids stable so the scene builds up instead of restarting. Set "next_step" = "lesson_step"+1 on every step, including the last one of this batch: the batch is not the lesson, and the app requests the next part itself until the objective is covered.`;
+};
 
 // Kept for callers that only need the user-visible instructions (diagnostics tooling, tests).
 export const TEACHING_SYSTEM_PROMPT = buildPrompt({
@@ -646,7 +697,8 @@ export function teachingPrompt(request: TeachingRequest, options: PromptOptions 
 }
 
 export function teachingLessonPrompt(request: TeachingRequest, options: PromptOptions = {}): string {
-  return `${buildPrompt(request, options).user}\n\n${LESSON_INSTRUCTIONS}`;
+  const built = buildPrompt(request, options);
+  return `${built.user}\n\n${lessonInstructionsFor(built.families)}`;
 }
 
 export function teachingSystemPrompt(options: PromptOptions = {}): string {

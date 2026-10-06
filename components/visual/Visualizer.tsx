@@ -20,7 +20,7 @@ import { DiagramRenderer } from "./DiagramRenderer";
 import { GraphVisualization } from "./GraphVisualization";
 import { Visual3DWrapper } from "./visual3d-wrapper";
 import type { BoardState } from "@/lib/board/types";
-import type { VisualScene } from "@/lib/visual/types";
+import type { VisualScene, VisualViewport } from "@/lib/visual/types";
 import type { Visual3DScene } from "@/lib/visual3d/types";
 
 export type VisualMode = "auto" | "2d" | "3d";
@@ -41,9 +41,15 @@ type Props = {
    * so the surrounding screen is allowed to fill it with the actual call to action.
    */
   emptyStage?: ReactNode;
+  /**
+   * The measured size of the 2D board, published upwards so the lesson pipeline can lay the scene out FOR
+   * it. The renderer owns the `ResizeObserver` (it is three components down, inside `.diagram-board`), and
+   * this is the only way that measurement reaches the engine.
+   */
+  onViewport?: (viewport: VisualViewport) => void;
 };
 
-export function Visualizer({ mode, board, scene, scene3d, focusId, onFocusObject, onEraseBoard, emptyStage }: Props) {
+export function Visualizer({ mode, board, scene, scene3d, focusId, onFocusObject, onEraseBoard, emptyStage, onViewport }: Props) {
   const hasDiagram = scene.objects.length > 0;
   const hasGraph = board.nodes.length > 0 || board.texts.length > 0;
   const has3D = scene3d.objects.length > 0;
@@ -96,7 +102,7 @@ export function Visualizer({ mode, board, scene, scene3d, focusId, onFocusObject
           <span>Teaching board · 2D</span>
           <span>drag to pan · scroll to zoom · click an object to focus</span>
         </div>
-        <DiagramRenderer scene={scene} focusId={focusId ?? null} onSelectObject={onFocusObject} />
+        <DiagramRenderer scene={scene} focusId={focusId ?? null} onSelectObject={onFocusObject} onViewport={onViewport} />
       </div>
     );
   }

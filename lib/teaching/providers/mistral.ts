@@ -9,12 +9,13 @@
 //   - one bounded repair turn reuses the SHARED repairTurn() correction,
 //   - the API key is read from the server environment only and is never sent to the client.
 import { Mistral } from "@mistralai/mistralai";
-import { TeachingLessonResponse, TeachingRequest, TeachingResponse } from "../types";
+import { ProviderTokenUsage, TeachingLessonResponse, TeachingRequest, TeachingResponse } from "../types";
 import { parseAllTeachingSteps, parseTeachingResponse, describeMalformedLessonSteps } from "../validation";
 import { RequestPlan } from "../requestPlan";
 import { ProviderError, asProviderError, statusOf, withProviderTimeout } from "./error";
 import { repairTurn } from "./repair";
-import { JSON_MODE_INSTRUCTIONS, jsonTeachingLessonSchema, jsonTeachingSchema } from "./jsonSchema";
+import { sumUsage, usageField } from "../usage";
+import { JSON_MODE_INSTRUCTIONS, jsonTeachingSchemaFor } from "./jsonSchema";
 
 // Overridable so the model can be swapped (or A/B tested) without a code change; the default is
 // Mistral's own documented small general-purpose model id.
@@ -33,6 +34,24 @@ function messagesFor(plan: RequestPlan, extraSystem = "", correction?: string) {
     { role: "system" as const, content: `${plan.system}\n\n${JSON_MODE_INSTRUCTIONS}${extraSystem}` },
     { role: "user" as const, content: correction ? `${plan.user}\n\n${correction}` : plan.user },
   ];
+}
+
+/**
+ * THE USAGE MISTRAL REPORTED FOR A CALL, verbatim.
+ *
+ * Read from `ChatCompletionResponse.usage` — `UsageInfo.promptTokens`, `UsageInfo.completionTokens` and
+ * `UsageInfo.totalTokens`. Mistral's SDK names are camelCase (unlike the OpenAI-shaped Groq response) and
+ * every one of them is optional, so an absent object and an absent field both mean "not reported".
+ */
+export function usageFromMistralCompletion(
+  usage: { promptTokens?: number; completionTokens?: number; totalTokens?: number } | null | undefined,
+): ProviderTokenUsage | undefined {
+  if (!usage) return undefined;
+  return {
+    ...(usage.promptTokens !== undefined ? { inputTokens: usage.promptTokens } : {}),
+    ...(usage.completionTokens !== undefined ? { outputTokens: usage.completionTokens } : {}),
+    ...(usage.totalTokens !== undefined ? { totalTokens: usage.totalTokens } : {}),
+  };
 }
 
 /**
@@ -111,8 +130,11 @@ export async function generateTeachingStepWithMistral(lesson: TeachingRequest, p
     // One bounded repair attempt, exactly like Gemini and Groq: an invalid field costs a repair turn,
     // not the whole lesson.
     let correction: string | undefined;
+    // Both turns count: the rejected one spent tokens to be thrown away.
+    const usageAttempts: (ProviderTokenUsage | undefined)[] = [];
     for (let attempt = 1; attempt <= 2; attempt += 1) {
       const completion = await requestCompletion(mistral, plan, correction);
+      usageAttempts.push(usageFromMistralCompletion(completion?.usage));
       const content = completion?.choices?.[0]?.message?.content;
       if (typeof content !== "string" || !content.trim()) throw new ProviderError("mistral", "Mistral returned an empty teaching response.", { status: 502, transient: true });
 
@@ -120,7 +142,7 @@ export async function generateTeachingStepWithMistral(lesson: TeachingRequest, p
       if (raw === null) throw new ProviderError("mistral", "Mistral returned an invalid structured response.", { status: 502, transient: true });
 
       const teachingResponse = parseTeachingResponse(raw);
-      if (teachingResponse) return teachingResponse;
+      if (teachingResponse) return { ...teachingResponse, ...usageField(sumUsage(usageAttempts)) };
       if (attempt === 2) {
         if (process.env.NODE_ENV !== "production") console.warn("[Mistral] step response rejected twice by validation:", JSON.stringify(raw).slice(0, 400));
         throw new ProviderError("mistral", "Mistral returned unsupported board instructions.", { status: 502, transient: true });
@@ -156,7 +178,8 @@ export async function generateTeachingLessonWithMistral(lesson: TeachingRequest,
     if (process.env.NODE_ENV !== "production" && steps.length < (raw as { steps: unknown[] }).steps.length) {
       console.warn(`[Mistral] ${(raw as { steps: unknown[] }).steps.length - steps.length} malformed lesson step(s) dropped; keeping ${steps.length}: ${describeMalformedLessonSteps(raw).join("; ")}`);
     }
-    return { steps };
+    // Batch-level usage: one lesson request is one call that happens to return several steps.
+    return { steps, ...usageField(sumUsage([usageFromMistralCompletion(completion?.usage)])) };
   } catch (error) {
     throw asProviderError(error, "mistral");
   }
@@ -172,7 +195,7 @@ async function requestCompletion(mistral: Mistral, plan: RequestPlan, correction
         maxTokens: 2048,
         responseFormat: {
           type: "json_schema",
-          jsonSchema: { name: "teaching_response", strict: false, schemaDefinition: jsonTeachingSchema as Record<string, unknown> },
+          jsonSchema: { name: "teaching_response", strict: false, schemaDefinition: jsonTeachingSchemaFor(plan.families) as Record<string, unknown> },
         },
       }, { timeoutMs: MISTRAL_TIMEOUT_MS });
     } catch (error) {
