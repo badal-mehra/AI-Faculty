@@ -9,7 +9,7 @@
 //   6. otherwise fail fast with a clear error.
 //
 // No step is ever repeated unchanged, and no model that already failed is retried in the same call.
-import { TeachingLessonResponse, LessonQualitySummary, TeachingRequest, TeachingResponse } from "../types";
+import { ProviderTokenUsage, TeachingLessonResponse, LessonQualitySummary, TeachingRequest, TeachingResponse } from "../types";
 import { ProviderError, TeachingProviderName, asProviderError, statusOf } from "./error";
 import {
   GEMINI_TEACHING_MODELS,
@@ -25,6 +25,7 @@ import { TeachingSimulation, simulateGemini, simulateGroq, simulateMistral } fro
 import { getPreferredGeminiModel, isGeminiModelAvailable, markGeminiModelUnavailable, recordGeminiFailure, recordGeminiSuccess } from "./health";
 import { ContextLevel } from "../context";
 import { RequestPlan, planRequest, replan } from "../requestPlan";
+import { sumUsage, usageField } from "../usage";
 import type { VisualFamilies } from "../prompt";
 import { applyStepsToProgress, buildLessonObjective, currentStage, lessonProgressView } from "../objective";
 import { alignAndJudge, LessonQualityReport, summariseQuality } from "../quality";
@@ -38,8 +39,26 @@ export type TeachingStepResult = {
   fallback: boolean;
   latencyMs: number;
   level: ContextLevel;
+  /** The planner's ESTIMATE of how large the request was. Never reported as usage. */
   estimatedTokens: number;
+  /** What the providers ACTUALLY reported for this request, or null when none of them said. */
+  actualTokens: number | null;
 };
+
+/**
+ * The tokens ONE request actually consumed.
+ *
+ * Every attempt that came back with usage is added, because a request that fell back through two providers
+ * or spent a turn on a rejected response really did cost both calls, and a total counting only the call
+ * that succeeded would hide exactly the spend the ladder exists to avoid.
+ *
+ * The signature is the point: this takes attempts and nothing else, so the planner's estimate
+ * (`plan.size.totalTokens`, measured from the prompt before anything was sent) is not reachable from here.
+ * There is no branch that substitutes one for the other, and no argument an estimate could arrive through.
+ */
+export function actualTokensFor(attempts: readonly (ProviderTokenUsage | null | undefined)[]): number | null {
+  return sumUsage(attempts);
+}
 
 const GEMINI_RETRY_DELAY_MS = 250;
 /** Once Gemini has consumed this much wall clock, skip straight to Groq instead of burning more. */
@@ -260,7 +279,7 @@ async function run<T extends TeachingResponse | TeachingLessonResponse>(
   lesson: TeachingRequest,
   path: "lesson" | "step",
   simulation: TeachingSimulation,
-): Promise<{ response: T; provider: TeachingProviderName; geminiAttempts: number; latencyMs: number; plan: RequestPlan }> {
+): Promise<{ response: T; provider: TeachingProviderName; geminiAttempts: number; latencyMs: number; plan: RequestPlan; actualTokens: number | null }> {
   const startedAt = Date.now();
   const plan = planRequest(lesson, path, (families) => schemaFor(path, families));
   const schemaJson = schemaFor(path, plan.families);
@@ -286,10 +305,14 @@ logProviderRequest({
   });
 
 const geminiConfigured = Boolean(process.env.GEMINI_API_KEY) || Boolean(simulation.gemini);
+  // Every provider attempt that came back with usage is collected here, so the caller is told what the
+  // request cost rather than what the successful call alone cost.
+  const usageAttempts: (ProviderTokenUsage | undefined)[] = [];
   const gemini = geminiConfigured ? await tryGemini(lesson, plan, path, simulation, startedAt) : null;
   if (gemini) {
     const response = (path === "lesson" ? (gemini.response as TeachingLessonResponse) : (gemini.response as TeachingResponse));
-    return { response: response as T, provider: "gemini", geminiAttempts: gemini.attempts, latencyMs: Date.now() - startedAt, plan };
+    usageAttempts.push(gemini.response.usage);
+    return { response: response as T, provider: "gemini", geminiAttempts: gemini.attempts, latencyMs: Date.now() - startedAt, plan, actualTokens: actualTokensFor(usageAttempts) };
   }
 
   // A lesson is made of many batches, so a student waiting several minutes for ONE of them is worse
@@ -301,7 +324,8 @@ const geminiConfigured = Boolean(process.env.GEMINI_API_KEY) || Boolean(simulati
   const groq = await tryGroq(lesson, plan, path, simulation);
   if (groq) {
     const response = (path === "lesson" ? (groq.response as TeachingLessonResponse) : (groq.response as TeachingResponse));
-    return { response: response as T, provider: "groq", geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: groq.plan };
+    usageAttempts.push(groq.response.usage);
+    return { response: response as T, provider: "groq", geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: groq.plan, actualTokens: actualTokensFor(usageAttempts) };
   }
 
   if (outOfTime(startedAt)) {
@@ -312,7 +336,8 @@ const geminiConfigured = Boolean(process.env.GEMINI_API_KEY) || Boolean(simulati
   const mistral = await tryMistral(lesson, plan, path, simulation);
   if (mistral) {
     const response = (path === "lesson" ? (mistral.response as TeachingLessonResponse) : (mistral.response as TeachingResponse));
-    return { response: response as T, provider: "mistral", geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: mistral.plan };
+    usageAttempts.push(mistral.response.usage);
+    return { response: response as T, provider: "mistral", geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: mistral.plan, actualTokens: actualTokensFor(usageAttempts) };
   }
 
   if (!geminiConfigured && !process.env.GROQ_API_KEY && !process.env.MISTRAL_API_KEY) {
@@ -333,13 +358,14 @@ export async function generateTeachingStep(lesson: TeachingRequest, simulation: 
   logQuality(judged.report, lesson);
   logComposition(judged.report, lesson);
   return {
-    response: { ...(judged.steps[0] ?? result.response), representation: result.plan.representation },
+    response: { ...(judged.steps[0] ?? result.response), representation: result.plan.representation, ...usageField(result.actualTokens) },
     provider: result.provider,
     geminiAttempts: result.geminiAttempts,
     fallback: result.provider !== "gemini",
     latencyMs: result.latencyMs,
     level: result.plan.level,
     estimatedTokens: result.plan.size.totalTokens,
+    actualTokens: result.actualTokens,
   };
 }
 

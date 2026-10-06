@@ -5,7 +5,7 @@
     "dev": "node ./node_modules/next/dist/bin/next dev",
     "build": "node ./node_modules/next/dist/bin/next build",
     "start": "node ./node_modules/next/dist/bin/next start",
-    "test": "tsc -p tsconfig.test.json && node .test-out/tests/visual.test.js && node .test-out/tests/visual3d.test.js && node .test-out/tests/teaching-pipeline.test.js && node .test-out/tests/teaching-alignment.test.js && node .test-out/tests/teaching-pedagogy.test.js && node .test-out/tests/visual-lifecycle.test.js && node .test-out/tests/visual-semantics.test.js && node .test-out/tests/lesson-objective.test.js && node .test-out/tests/board-anchoring.test.js && node .test-out/tests/teaching-taxonomy.test.js && node .test-out/tests/teaching-policy.test.js && node .test-out/tests/visual-composition.test.js",
+    "test": "tsc -p tsconfig.test.json && node .test-out/tests/visual.test.js && node .test-out/tests/visual3d.test.js && node .test-out/tests/teaching-pipeline.test.js && node .test-out/tests/teaching-alignment.test.js && node .test-out/tests/teaching-pedagogy.test.js && node .test-out/tests/visual-lifecycle.test.js && node .test-out/tests/visual-semantics.test.js && node .test-out/tests/lesson-objective.test.js && node .test-out/tests/board-anchoring.test.js && node .test-out/tests/teaching-taxonomy.test.js && node .test-out/tests/teaching-policy.test.js && node .test-out/tests/visual-composition.test.js && node .test-out/tests/visual-regression.test.js",
     "assets:build": "node scripts/build-assets.mjs",
     "assets:validate": "node scripts/validate-assets.mjs",
     "audit:assets": "node scripts/audit-assets.mjs",

@@ -17,10 +17,20 @@
 //                    and it never clips and never renders a diagram microscopically small.
 import { type CSSProperties, type PointerEvent, type ReactElement, type ReactNode, type WheelEvent, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { Point, VisualObject, VisualScene } from "../../lib/visual/types";
+import type { Point, VisualObject, VisualScene, VisualViewport } from "../../lib/visual/types";
 import { boxOfObject, clamp, pointAlongRoute, routeConnection } from "../../lib/visual/geometry";
 import type { Box, ConnectionRoute } from "../../lib/visual/geometry";
 import { fitLabelInBox, MAX_LABEL_FONT_SIZE, MIN_LABEL_FONT_SIZE } from "../../lib/visual/labelFit";
+import { CANONICAL_VIEWPORT, isRealMeasurement, viewportFromStage } from "../../lib/visual/viewport";
+// PHASE 1: THE RENDERER PAINTS WITH THE SAME METRICS THE LAYOUT MEASURED WITH.
+//
+// These imports are the whole point. This file used to carry its own `ROLE_FONT` table, its own line
+// spacing (1.22 here, 1.20 there, 1.20 again) and its own idea of how wide a character is. A reserved box
+// and a painted box that disagree are how a caption lands on a shape, so there is now one type scale
+// (lib/visual/spacing.ts), one line height and one glyph table (lib/visual/typography.ts), and both sides
+// read them.
+import { lineOffsetY } from "../../lib/visual/typography";
+import { TYPE_WEIGHT } from "../../lib/visual/spacing";
 import { codeLanguageLabel, highlightCode } from "../../lib/visual/code";
 import { CODE_FONT_SIZE } from "../../lib/visual/layout";
 
@@ -45,6 +55,22 @@ type Props = {
   onSelectObject?: (id: string | null) => void;
   /** Raised while a step is being applied, so in-flight motion can be settled instead of replayed. */
   animating?: boolean;
+  /**
+   * The measured size of the board this renderer is filling, so the scene can be laid out FOR it.
+   *
+   * The renderer is the only place that can measure the element, and the engine is the only place that can
+   * lay a scene out. Reporting the measurement upwards is what makes one board unit equal one CSS pixel,
+   * which is the only way a type size the layout chose survives to the student's screen.
+   */
+  onViewport?: (viewport: VisualViewport) => void;
+  /**
+   * Draws the development-only diagnostics overlay: ids, groups, roles, bounds, anchors, label targets,
+   * routes, composition and quality scores.
+   *
+   * Compiled out of production by `isDiagnosticsEnabled()` in lib/visual/diagnostics.ts, so it cannot be
+   * turned on in a shipped build even by a prop.
+   */
+  diagnostics?: boolean;
 };
 
 // Roles carry the hierarchy. This is the ONLY place role -> type size is defined, so a title looks like
@@ -127,29 +153,8 @@ function CodeBlock({ object, subdued }: { object: VisualObject; subdued: boolean
   );
 }
 
-const ROLE_FONT: Record<string, number> = {
-  title: 22,
-  subtitle: 17,
-  step: 16,
-  caption: 13,
-  annotation: 13,
-  callout: 15,
-  primary: 20,
-  secondary: 16,
-};
-
-const ROLE_WEIGHT: Record<string, number> = {
-  title: 800,
-  subtitle: 700,
-  step: 700,
-  caption: 600,
-  annotation: 500,
-  callout: 700,
-  primary: 700,
-  secondary: 600,
-};
-
-/** Paint layer: 0 = connections, 1 = shapes, 2 = labels. Arrow tails must disappear under their nodes. */
+/**
+ * Paint layer: 0 = connections, 1 = shapes, 2 = labels. Arrow tails must disappear under their nodes. */
 const layerOf = (object: VisualObject): number =>
   object.kind === "arrow" || object.kind === "connector" ? 0 : object.kind === "text" || object.kind === "formula" || object.kind === "label" || object.kind === "icon" || object.kind === "code_block" ? 2 : 1;
 
@@ -336,7 +341,7 @@ function LeaderLine({ from, to, className }: { from: Point; to: Point; className
   );
 }
 
-function DiagramRendererImpl({ scene, focusId, onSelectObject, animating = true }: Props): ReactElement {
+function DiagramRendererImpl({ scene, focusId, onSelectObject, animating = true, onViewport, diagnostics = false }: Props): ReactElement {
   const reducedMotion = usePrefersReducedMotion();
   const motionEnabled = animating && !reducedMotion;
   const [zoom, setZoom] = useState(1);
@@ -371,6 +376,33 @@ function DiagramRendererImpl({ scene, focusId, onSelectObject, animating = true 
       window.removeEventListener("resize", measure);
     };
   }, []);
+
+  /**
+   * PUBLISH THE MEASURED BOARD, so the layout can be done FOR this board.
+   *
+   * This is the other half of the viewport change. The renderer is the only place that can measure the
+   * element, and the engine is the only place that can lay a scene out — so the measurement is sent
+   * upwards and the scene is rebuilt for it. Before this, the layout believed in an 800x520 board and the
+   * renderer scaled the result; now the layout is told the real size and the renderer shows it 1:1.
+   *
+   * The callback fires only when the measured rectangle genuinely CHANGES, and the caller rebuilds by
+   * replaying the lesson's actions, so a resize is deterministic and cannot loop: the rebuilt scene
+   * produces the same board, which produces the same measurement, which produces no further update.
+   */
+  useEffect(() => {
+    if (!onViewport) return;
+    const width = stage?.width ?? 0;
+    const height = stage?.height ?? 0;
+    // ONLY A REAL MEASUREMENT IS PUBLISHED.
+    //
+    // A `ResizeObserver` fires once before layout settles, and the element can be tiny at that point. The
+    // alternative — publishing the canonical fallback for a degenerate size — is indistinguishable from a
+    // real 800x520 board, so a consumer composes its whole lesson for a rectangle the student will never
+    // see and the board renders mis-framed. Staying silent is honest: "not measured yet" and "measured as
+    // 800x520" must not be the same event.
+    if (!isRealMeasurement(width, height)) return;
+    onViewport(viewportFromStage(width, height));
+  }, [onViewport, stage?.width, stage?.height]);
 
   const byId = useMemo(() => {
     const map = new Map<string, VisualObject>();
@@ -414,7 +446,8 @@ function DiagramRendererImpl({ scene, focusId, onSelectObject, animating = true 
     const boxes = solids.length > 0
       ? solids.map((object) => boxOfObject(object))
       : scene.objects.map((object) => boxOfObject(object));
-    if (boxes.length === 0) return { x: 0, y: 0, w: 800, h: 520 };
+    const viewport = scene.viewport ?? CANONICAL_VIEWPORT;
+    if (boxes.length === 0) return { x: 0, y: 0, w: viewport.width, h: viewport.height };
     let left = Infinity;
     let top = Infinity;
     let right = -Infinity;
@@ -434,40 +467,36 @@ function DiagramRendererImpl({ scene, focusId, onSelectObject, animating = true 
       right = Math.max(right, box.right);
       bottom = Math.max(bottom, box.bottom);
     }
-const margin = 34;
-    // THE FRAME IS THE DRAWING PLUS ITS MARGINS — not a fixed minimum inflated to a canonical size.
+    const margin = viewport.margin;
+    // PHASE 12: THE BOARD IS THE STAGE, AND ONE BOARD UNIT IS ONE CSS PIXEL.
     //
-    // A 620-wide floor against a 372-wide listing meant the drawing occupied 60% of the board and 40%
-    // was dead space, identically at every screen size, because the floor is in board units and the
-    // board is a different pixel width on every display. Content that does not fill the frame does not
-    // become more legible by being surrounded by emptiness; it just looks unfinished.
+    // This whole block used to frame the CONTENT and then let `meet` scale that frame into whatever the
+    // element measured. The consequence was a divide nobody could see: a 13px annotation on a board laid
+    // out 800 units wide, shown in a 366px phone column, painted at 13 * 366/800 = 6px. The layout had
+    // chosen a readable size; the renderer then multiplied it away.
     //
-    // The remaining floor is small and exists only so a genuinely tiny drawing (one arrow, one cell)
-    // is not magnified into a poster. Above the ceiling the board stops growing and the extra room is
-    // left as margin, which is what a whiteboard does.
-    const minimum = { w: 380, h: 300 };
-    const maximum = { w: 1040, h: 660 };
+    // So the frame is the MEASURED BOARD, and the drawing is the thing that gets fitted into it. Type
+    // sizes now survive to the screen, and the safe margins are the same ones the layout respected.
+    // Content that overhangs the board — which should not happen, and which the quality gate fails on —
+    // still widens the frame rather than being cropped, so nothing is ever lost.
+    const minimum = { w: viewport.width, h: viewport.height };
+    const maximum = { w: viewport.width, h: viewport.height };
     const contentW = right - left + margin * 2;
     const contentH = bottom - top + margin * 2;
-    let w = clamp(contentW, minimum.w, maximum.w);
-    let h = clamp(contentH, minimum.h, maximum.h);
+    // Only a drawing that genuinely does not fit inside the safe margins is allowed to grow the frame.
+    // Everything else is shown 1:1.
+    let w = Math.max(minimum.w, contentW);
+    let h = Math.max(minimum.h, contentH);
     // MATCH THE AVAILABLE AREA'S SHAPE, so nothing is letterboxed away.
-    //
-    // The viewBox is scaled to fit the element with `meet`, which picks the limiting axis and leaves
-    // equal dead bands on the other one. A 440x528 frame in a 1118x727 board scaled on height, so the
-    // drawing occupied 64% of the width and a third of the board was background — at every screen size,
-    // because the mismatch was baked into the frame rather than measured from the screen. Widening (or
-    // heightening) the frame to the stage's aspect costs nothing and hands the drawing all of the room.
     if (stage) {
       const stageAspect = stage.width / Math.max(stage.height, 1);
       if (w / h < stageAspect) w = Math.min(h * stageAspect, maximum.w * 1.6);
       else h = Math.min(w / stageAspect, maximum.h * 1.6);
     }
-    // The frame is CENTRED on the drawing on BOTH axes. Top-aligning it left the bottom two thirds
-    // of the board empty whenever a structure was short (a four-cell array), which reads as a broken
-    // board rather than as deliberate framing.
-    return { x: left - (w - contentW) / 2 - margin, y: top - (h - contentH) / 2 - margin, w, h };
-  }, [scene.objects, stage]);
+    // The frame is the BOARD, and the drawing is centred in it on BOTH axes: a short structure (a
+    // four-cell array) sits in the middle of the board rather than at the top with two thirds empty.
+    return { x: Math.min(0, left - margin), y: Math.min(0, top - margin), w: Math.max(w, right - left + margin * 2), h: Math.max(h, bottom - top + margin * 2) };
+  }, [scene.objects, scene.viewport, stage]);
 
   // Focus must NEVER crop the board. The whole scene stays framed at all times; pointing at one object
   // is carried by its brightness and by the rest receding, not by zooming in until everything else has
@@ -629,11 +658,11 @@ return (
                     <text
                       className={`diagram-text role-${role}${subduedFor(object, focusIds) ? " is-dimmed" : ""}${fixedContrast ? " is-fixed-contrast" : ""}`}
                       fontSize={fontSize}
-                      fontWeight={ROLE_WEIGHT[role] ?? 600}
+                      fontWeight={TYPE_WEIGHT[role] ?? 600}
                       textAnchor="middle"
                     >
                       {lines.map((line, index) => (
-                        <tspan key={`${object.id}-l${index}`} x={0} y={(index - (lines.length - 1) / 2) * fontSize * 1.22}>
+                        <tspan key={`${object.id}-l${index}`} x={0} y={lineOffsetY(index, lines.length, fontSize)}>
                           {line}
                         </tspan>
                       ))}
@@ -643,11 +672,11 @@ return (
                   <text
                     className={`diagram-text role-${role}${subduedFor(object, focusIds) ? " is-dimmed" : ""}${fixedContrast ? " is-fixed-contrast" : ""}`}
                     fontSize={fontSize}
-                    fontWeight={ROLE_WEIGHT[role] ?? 600}
+                    fontWeight={TYPE_WEIGHT[role] ?? 600}
                     textAnchor="middle"
                   >
                     {lines.map((line, index) => (
-                      <tspan key={`${object.id}-l${index}`} x={0} y={(index - (lines.length - 1) / 2) * fontSize * 1.22}>
+                      <tspan key={`${object.id}-l${index}`} x={0} y={lineOffsetY(index, lines.length, fontSize)}>
                         {line}
                       </tspan>
                     ))}
@@ -672,7 +701,7 @@ return (
                   dominantBaseline="middle"
                 >
                   {object.textLines?.length ? object.textLines.map((line, index) => (
-                    <tspan key={`${object.id}-l${index}`} x={object.x} y={object.y + (index - ((object.textLines?.length ?? 1) - 1) / 2) * fontSize * 1.2}>
+                    <tspan key={`${object.id}-l${index}`} x={object.x} y={object.y + lineOffsetY(index, object.textLines?.length ?? 1, fontSize)}>
                       {line}
                     </tspan>
                   )) : object.text}
@@ -730,12 +759,12 @@ return (
                 <text
                   className={`diagram-shape-label role-${role}${subdued ? " is-dimmed" : ""}`}
                   fontSize={label.fontSize}
-                  fontWeight={ROLE_WEIGHT[role] ?? 700}
+                  fontWeight={TYPE_WEIGHT[role] ?? 700}
                   textAnchor="middle"
                   dominantBaseline="central"
                 >
                   {label.lines.map((line, index) => {
-                    const y = (index - (label.lines.length - 1) / 2) * label.fontSize * 1.2;
+                    const y = lineOffsetY(index, label.lines.length, label.fontSize);
                     // In a compartmented node the value belongs in the LEFT compartment only.
                     return (
                       <tspan key={`${object.id}-l${index}`} x={compartments ? -object.width / 4 : 0} y={y}>

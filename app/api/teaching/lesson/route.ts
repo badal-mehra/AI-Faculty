@@ -45,6 +45,7 @@ function qualitySummary(report: ReturnType<typeof alignAndJudge>["report"]): Les
       retiredObjectCount: entry.retiredObjectCount,
       supportingObjectCount: entry.supportingObjectCount,
       contextObjectCount: entry.contextObjectCount,
+      focusedObjectCount: entry.focusedObjectCount,
       visualFocusScore: entry.visualFocusScore,
       densityScore: entry.densityScore,
       overlapCount: entry.overlapCount,

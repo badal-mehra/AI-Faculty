@@ -11,7 +11,8 @@ import { BoardAction, BoardState, emptyBoardState } from "@/lib/board/types";
 import { applyVisualActions, getVisualScene, settleVisualScene } from "@/lib/visual/engine";
 import { parseVisualActions } from "@/lib/visual/validate";
 import { composeScene, compositionLogLine } from "@/lib/visual/composition";
-import { VisualScene, emptyVisualScene } from "@/lib/visual/types";
+import { VisualScene, VisualViewport, emptyVisualScene } from "@/lib/visual/types";
+import { sameViewport } from "@/lib/visual/viewport";
 import { detectRepresentationIntent } from "@/lib/teaching/representation";
 import { applyVisual3DActions, getVisual3DScene } from "@/lib/visual3d/engine";
 import { Visual3DScene, emptyVisual3DScene } from "@/lib/visual3d/types";
@@ -105,6 +106,29 @@ export function Classroom() {
   // see the CURRENT mode, not the one they closed over.
   const visualModeRef = useRef<VisualMode>("auto");
   visualModeRef.current = visualMode;
+  // THE MEASURED BOARD, held in a REF and never in state.
+  //
+  // PHASE 12. The engine used to lay every scene out for a fixed 800x520 canvas and the renderer scaled
+  // the result into whatever the panel happened to measure. On a 390px phone that turned a 13px caption
+  // into six pixels and a whole diagram into a smudge — the layout had chosen a readable size and the
+  // renderer multiplied it away.
+  //
+  // A ref, not state, for two reasons. The renderer's `onViewport` fires on every resize frame, and state
+  // would re-render the whole classroom for each one. And `playStoredLessonStep` is a `useCallback` whose
+  // dependencies would then change on every frame, cascading into the pending-replay effect below.
+  const viewportRef = useRef<VisualViewport | null>(null);
+  // A board-size change that has not been rebuilt yet. Rebuilding is a REPLAY, not a patch, because a
+  // scene is the accumulated result of every step so far and only the actions can reproduce it.
+  //
+  // The counter is what lets the rebuild run in an effect: writing a ref does not re-render, and a ref
+  // read inside a memoised callback is invisible to React. One state increment per REAL size change is
+  // the cheapest possible signal, and the identity guard below means it happens only when it must.
+  const [viewportRebuild, setViewportRebuild] = useState(0);
+  const pendingViewportRef = useRef<VisualViewport | null>(null);
+  // Every step of the lesson so far, ACCUMULATED across batches. `lessonStepsRef` below holds only the
+  // latest batch — the app asks for a new batch every few steps and replaces the map — so a resize could
+  // not replay a lesson that spans more than one batch. This ref is what makes a full re-layout possible.
+  const allLessonStepsRef = useRef(new Map<number, TeachingResponse>());
   // Set while an INTERRUPTION's answer is being applied, so the objects it adds are marked temporary and
   // leave the board when the lesson resumes. Without this the answer's diagram stays for the rest of the
   // lesson, which is how a two-second aside about tau ends up sitting beside the numerical substitution.
@@ -188,6 +212,7 @@ export function Classroom() {
       const played = applyVisualActions(current, step.visual_actions, {
         step: step.lesson_step,
         stage: stageIndexFor(step.lesson_step),
+        ...(viewportRef.current ? { viewport: viewportRef.current } : {}),
         ...(temporarilyRef.current ? { temporary: true } : {}),
       });
       const parsed = parseVisualActions(step.visual_actions);
@@ -196,6 +221,7 @@ export function Classroom() {
         step: step.lesson_step,
         stage: stageIndexFor(step.lesson_step),
         ...(step.teaching_intent ? { teachingIntent: step.teaching_intent } : {}),
+        ...(viewportRef.current ? { viewport: viewportRef.current } : {}),
         ...(temporarilyRef.current ? { temporary: true } : {}),
       });
       console.info(compositionLogLine(composed.diagnostics));
@@ -225,6 +251,65 @@ export function Classroom() {
     pendingReplayRef.current = null;
     playStoredLessonStep(pending);
   }, [playStoredLessonStep, board, visual3dScene, visualScene]);
+
+  /**
+   * REBUILD THE BOARD FOR A NEW SIZE.
+   *
+   * PHASE 12/19. A scene is the accumulated result of every step so far, so the only correct way to lay it
+   * out for a differently-shaped board is to REPLAY those steps. Patching positions would produce a board
+   * that was never designed — objects at coordinates no compiler chose — and a resize is exactly the moment
+   * when "what should this look like" changes rather than merely "where is everything".
+   *
+   * Two properties make this safe:
+   *
+   *   DETERMINISTIC. The same actions, in the same order, against the same viewport, produce the same
+   *   scene. So a resize is reproducible, and a replay after a resize is the same board.
+   *
+   *   NON-LOOPING. The renderer publishes its measurement, this rebuilds, and the rebuilt scene is painted
+   *   into the same element, so the next measurement equals this one and the identity guard stops it.
+   *   That is why the guard is on the measured rectangle and not merely on "a viewport was published".
+   */
+  const handleViewport = useCallback((next: VisualViewport) => {
+    if (sameViewport(viewportRef.current ?? undefined, next)) return;
+    viewportRef.current = next;
+    // Nothing has been taught yet, so there is nothing to rebuild — the next step will be laid out for it.
+    if (activeLessonStepRef.current === null || allLessonStepsRef.current.size === 0) return;
+    // Snapshots taken against the old board would restore old geometry on Back or Next, so they are
+    // dropped rather than left to mislead. The controls recover because the steps are re-applied below.
+    sceneBeforeStepRef.current = new Map();
+    sceneAfterStepRef.current = new Map();
+    pendingViewportRef.current = next;
+    setViewportRebuild((current) => current + 1);
+  }, []);
+
+  useEffect(() => {
+    const target = pendingViewportRef.current;
+    if (!target) return;
+    pendingViewportRef.current = null;
+    const active = activeLessonStepRef.current;
+    if (active === null) return;
+    // Replay every step up to and including the one on screen, in order, against the new board.
+    const ordered = [...allLessonStepsRef.current.values()]
+      .filter((step) => step.lesson_step <= active)
+      .sort((a, b) => a.lesson_step - b.lesson_step);
+    if (ordered.length === 0) return;
+    const rebuilt = ordered.reduce<VisualScene>((scene, step) => {
+      const played = applyVisualActions(scene, step.visual_actions, {
+        step: step.lesson_step,
+        stage: stageIndexFor(step.lesson_step),
+        viewport: target,
+      });
+      const parsed = parseVisualActions(step.visual_actions);
+      if (!parsed) return played;
+      return composeScene(played, parsed, {
+        step: step.lesson_step,
+        stage: stageIndexFor(step.lesson_step),
+        ...(step.teaching_intent ? { teachingIntent: step.teaching_intent } : {}),
+        viewport: target,
+      }).scene;
+    }, emptyVisualScene());
+    setVisualScene(rebuilt);
+  }, [stageIndexFor, viewportRebuild]);
 
   // BACK / FORWARD through the steps that have actually been delivered. Moving backwards restores the
   // scene that step produced, so the student sees the board as it was — not the current board minus
@@ -318,7 +403,7 @@ export function Classroom() {
     const visualState = getVisualScene(starting ? emptyVisualScene() : visualScene);
     const visualState3d = getVisual3DScene(starting ? emptyVisual3DScene() : visual3dScene);
     const step = starting ? 1 : (activeLessonStepRef.current ?? lessonStep);
-    if (starting) { setBoard(emptyBoardState()); setVisualScene(emptyVisualScene()); setVisual3dScene(emptyVisual3DScene()); setLessonStep(1); }
+    if (starting) { setBoard(emptyBoardState()); setVisualScene(emptyVisualScene()); setVisual3dScene(emptyVisual3DScene()); setLessonStep(1); allLessonStepsRef.current = new Map(); sceneBeforeStepRef.current = new Map(); sceneAfterStepRef.current = new Map(); }
     stopTeacher();
     setIsLoading(true);
     setError(null);
@@ -345,6 +430,11 @@ export function Classroom() {
       // re-fetch. Caching first and playing second keeps the guarantee Stop actually promises.
       lessonIdRef.current = `lesson-${requestId}`;
       lessonStepsRef.current = new Map(payload.steps.map((item) => [item.lesson_step, item]));
+      // The same steps are ALSO accumulated, and this map only ever grows within a lesson. A resize
+      // rebuilds the board by replaying the lesson from step one, and it can only do that if the actions of
+      // every earlier step are still in hand — a lesson spans several batches, and the map above is
+      // replaced with each new one.
+      for (const item of payload.steps) allLessonStepsRef.current.set(item.lesson_step, item);
       // The server owns the objective and reports what it covered. The classroom trusts that, and
       // nothing else, when deciding whether the topic has been taught.
       if (payload.progress) {
@@ -540,6 +630,7 @@ void requestTeachingLesson();
     stopTeaching();
     activeLessonStepRef.current = null;
     lessonStepsRef.current = new Map();
+    allLessonStepsRef.current = new Map();
     teachingHistoryRef.current = [];
     progressRef.current = null;
     setProgress(null);
@@ -696,6 +787,7 @@ setVisual3dScene((current) => applyVisual3DActions(current, payload.visual3d_act
             onFocusObject={setVisualFocusId}
             onEraseBoard={(target) => executeActions([{ action: "erase", target }])}
             emptyStage={lessonStarted ? undefined : <StarterTopics onPick={startWithTopic} />}
+            onViewport={handleViewport}
           />
         </div>
         <aside className="teacher-panel">
