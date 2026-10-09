@@ -21,13 +21,29 @@ function LoadingFallback() {
         height: "100%",
         minHeight: "430px",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        gap: 16,
         color: "#94a3b8",
         fontSize: 13,
+        background: "radial-gradient(ellipse 100% 70% at 50% 15%, #14251f, #07100e)",
       }}
     >
-      Loading 3D renderer…
+      {/* Spinning ring loader */}
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          border: "3px solid #1e3a30",
+          borderTopColor: "#72df9b",
+          borderRadius: "50%",
+          animation: "scene3d-spin .9s linear infinite",
+        }}
+      />
+      <span style={{ color: "#7f9990", letterSpacing: ".05em", fontWeight: 600 }}>
+        Initialising 3D renderer…
+      </span>
     </section>
   );
 }

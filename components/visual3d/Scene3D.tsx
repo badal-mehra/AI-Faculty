@@ -373,8 +373,10 @@ export function Scene3D({
 
   if (!webglAvailable) {
     return (
-      <div style={{ padding: 24, color: "#e2e8f0", textAlign: "center" }}>
-        <div style={{ fontSize: 14, color: "#94a3b8" }}>3D rendering is not available in this browser.</div>
+      <div style={{ padding: 32, color: "#e2e8f0", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <div style={{ fontSize: 32, lineHeight: 1 }}>🖥️</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#d4e8df" }}>3D rendering is unavailable</div>
+        <div style={{ fontSize: 12, color: "#7f9990", maxWidth: 320, lineHeight: 1.6 }}>Your browser does not support WebGL. Try enabling hardware acceleration, or switch to the 2D diagram view.</div>
       </div>
     );
   }
@@ -394,8 +396,8 @@ export function Scene3D({
         gl={{ antialias: true, alpha: false, stencil: false, depth: true, preserveDrawingBuffer: true }}
         style={{ width: "100%", height: "100%", display: "block" }}
       >
-        <color attach="background" args={["#08110f"]} />
-        <fog attach="fog" args={["#08110f", radius * 6, radius * 22]} />
+        <color attach="background" args={["#070f0d"]} />
+        <fog attach="fog" args={["#070f0d", radius * 7, radius * 24]} />
         {/* Educational lighting: a clear key light for shape reading, a cool fill so the shadow side
             is never black, and a soft rim that separates the model from the background. */}
         <ambientLight intensity={0.62} color="#a8c4bb" />
@@ -463,7 +465,7 @@ export function Scene3D({
           of leaving an unexplained empty stage. It disappears as soon as the geometry is visible. */}
       {requestedModels > 0 && assetStatus.ready + assetStatus.failed < requestedModels ? (
         <div className="scene3d-loading" data-testid="visual3d-loading">
-          <span>Loading 3D models…</span>
+          <span>Loading 3D model{requestedModels > 1 ? "s" : ""}…</span>
         </div>
       ) : null}
     </div>

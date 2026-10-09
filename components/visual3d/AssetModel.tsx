@@ -393,42 +393,50 @@ export function FallbackPrimitive({
   label?: string;
 }) {
   const c = new THREE.Color(color ?? "#94a3b8");
+  // Slightly warmer emissive so fallbacks glow faintly and are visible even without strong lighting
+  const emissive = c.clone().multiplyScalar(0.18);
   const s = Math.max(scale, type === "particle" ? 0.02 : 0.05);
-  const text = label;
+  const mat = (roughness = 0.55, metalness = 0.05) => (
+    <meshStandardMaterial color={c} roughness={roughness} metalness={metalness} emissive={emissive} emissiveIntensity={0.35} />
+  );
 
   switch (type) {
     case "box":
-      return <mesh><boxGeometry args={[s, s, s]} /><meshStandardMaterial color={c} roughness={0.55} /></mesh>;
+      return <mesh><boxGeometry args={[s, s, s]} />{mat(0.55)}</mesh>;
     case "cylinder":
-      return <mesh><cylinderGeometry args={[s * 0.5, s * 0.5, s, 28]} /><meshStandardMaterial color={c} roughness={0.5} /></mesh>;
+      return <mesh><cylinderGeometry args={[s * 0.5, s * 0.5, s, 32]} />{mat(0.5)}</mesh>;
     case "cone":
-      return <mesh><coneGeometry args={[s * 0.5, s, 28]} /><meshStandardMaterial color={c} roughness={0.55} /></mesh>;
+      return <mesh><coneGeometry args={[s * 0.5, s, 32]} />{mat(0.55)}</mesh>;
     case "torus":
-      return <mesh><torusGeometry args={[s * 0.5, s * 0.18, 14, 40]} /><meshStandardMaterial color={c} roughness={0.5} /></mesh>;
+      return <mesh><torusGeometry args={[s * 0.5, s * 0.18, 16, 48]} />{mat(0.5)}</mesh>;
     case "plane":
-      return <mesh rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[s, s]} /><meshStandardMaterial color={c} roughness={0.7} side={THREE.DoubleSide} /></mesh>;
+      return (
+        <mesh rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[s, s]} />
+          <meshStandardMaterial color={c} roughness={0.7} emissive={emissive} emissiveIntensity={0.2} side={THREE.DoubleSide} />
+        </mesh>
+      );
     case "arrow":
       return (
         <group>
-          <mesh position={[0, s / 2, 0]}><cylinderGeometry args={[s * 0.05, s * 0.05, s, 12]} /><meshStandardMaterial color={c} /></mesh>
-          <mesh position={[0, s * 0.94, 0]}><coneGeometry args={[s * 0.16, s * 0.28, 12]} /><meshStandardMaterial color={c} /></mesh>
+          <mesh position={[0, s / 2, 0]}><cylinderGeometry args={[s * 0.05, s * 0.05, s, 12]} />{mat(0.4)}</mesh>
+          <mesh position={[0, s * 0.94, 0]}><coneGeometry args={[s * 0.16, s * 0.28, 12]} />{mat(0.4)}</mesh>
         </group>
       );
     case "line":
-      return <mesh rotation={[-Math.PI / 2, 0, 0]}><cylinderGeometry args={[s * 0.02, s * 0.02, s, 8]} /><meshStandardMaterial color={c} /></mesh>;
+      return <mesh rotation={[-Math.PI / 2, 0, 0]}><cylinderGeometry args={[s * 0.02, s * 0.02, s, 8]} />{mat(0.6)}</mesh>;
     case "tube":
-      return <mesh><torusGeometry args={[s * 0.5, s * 0.12, 14, 40]} /><meshStandardMaterial color={c} roughness={0.5} /></mesh>;
+      return <mesh><torusGeometry args={[s * 0.5, s * 0.12, 16, 48]} />{mat(0.5)}</mesh>;
     case "molecule":
-      return <mesh><icosahedronGeometry args={[s * 0.5, 1]} /><meshStandardMaterial color={c} roughness={0.4} metalness={0.2} /></mesh>;
+      return <mesh><icosahedronGeometry args={[s * 0.5, 1]} />{mat(0.4, 0.2)}</mesh>;
     case "crystal":
-      return <mesh><octahedronGeometry args={[s * 0.6, 0]} /><meshStandardMaterial color={c} roughness={0.3} metalness={0.1} /></mesh>;
+      return <mesh><octahedronGeometry args={[s * 0.6, 0]} /><meshStandardMaterial color={c} roughness={0.25} metalness={0.15} emissive={emissive} emissiveIntensity={0.4} /></mesh>;
     case "text":
-      return <mesh><boxGeometry args={[s * 2, s, s * 0.2]} /><meshStandardMaterial color={c} roughness={0.6} /></mesh>;
+      return <mesh><boxGeometry args={[s * 2.2, s * 0.9, s * 0.18]} />{mat(0.6)}</mesh>;
     case "sphere":
     default:
-      return <mesh><sphereGeometry args={[s * 0.6, 28, 20]} /><meshStandardMaterial color={c} roughness={0.6} /></mesh>;
+      return <mesh><sphereGeometry args={[s * 0.6, 32, 22]} />{mat(0.6)}</mesh>;
   }
-  void text;
 }
 
 export function preloadAsset(assetId: string): void {
