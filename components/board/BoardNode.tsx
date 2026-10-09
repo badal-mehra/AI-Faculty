@@ -31,11 +31,31 @@ export function BoardNode({ node, highlighted, onErase }: Props) {
   }, [node.value]);
 
   return (
-    <g transform={`translate(${node.x} ${node.y})`} onDoubleClick={() => onErase(node.id)}>
+    <g
+      transform={`translate(${node.x} ${node.y})`}
+      onDoubleClick={() => onErase(node.id)}
+      role="img"
+      aria-label={`Node: ${node.value}`}
+    >
       <g className="board-node">
-        {highlighted && <circle className="node-halo" r="46" />}
-        <circle className={`node-circle ${highlighted ? "is-highlighted" : ""}`} r={NODE_RADIUS} />
-        <text ref={labelRef} className="node-label" style={{ fontSize }} textAnchor="middle" dominantBaseline="central">{node.value}</text>
+        {/* Halo ring for highlighted state */}
+        {highlighted && <circle className="node-halo" r={NODE_RADIUS + 15} />}
+        {/* Main node circle */}
+        <circle
+          className={`node-circle${highlighted ? " is-highlighted" : ""}`}
+          r={NODE_RADIUS}
+        />
+        {/* Node label — centred both horizontally and vertically */}
+        <text
+          ref={labelRef}
+          className="node-label"
+          style={{ fontSize }}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          dy="0"
+        >
+          {node.value}
+        </text>
       </g>
     </g>
   );
