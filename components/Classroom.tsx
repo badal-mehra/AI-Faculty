@@ -19,6 +19,15 @@ import { Visual3DScene, emptyVisual3DScene } from "@/lib/visual3d/types";
 import { TEACHING_LANGUAGES, TeachingLanguage, TeachingLessonResponse, TeachingResponse } from "@/lib/teaching/types";
 import type { LessonProgressView } from "@/lib/teaching/objective";
 import { deriveLessonState } from "@/lib/teaching/objective";
+import { formatTokenUsage, totalOfUsage, UNKNOWN_TOKENS } from "@/lib/teaching/usage";
+
+interface PersistHandlers {
+  saveSession: (data: Record<string, unknown>) => void;
+  saveLessonSteps: (steps: Array<Record<string, unknown>>) => Promise<void>;
+  saveMessage: (message: Record<string, unknown>) => Promise<void>;
+  saveUsage: (usage: Record<string, unknown>) => Promise<void>;
+  setSaveError: (error: string | null) => void;
+}
 
 // SAFETY cap only. A deep lesson is as long as its objective requires; this bound exists so a
 // provider that never advances cannot loop forever, and it is never a length target.
@@ -42,7 +51,24 @@ const VOICE_START_TIMEOUT_MS = 8000;
 const VOICE_LOADING_TIMEOUT_MS = 30000;
 const VOICE_QUIET_TIMEOUT_MS = 75000;
 
-export function Classroom() {
+interface ClassroomProps {
+  sessionId?: string;
+  initialStep?: number;
+  persistHandlers?: PersistHandlers;
+  /**
+   * A topic the student already typed on the new-lesson screen. The classroom opens directly onto the
+   * lesson it was handed rather than making them type the same question twice, because the session was
+   * created FROM that question and the board they came to see is the answer to it.
+   */
+  initialQuestion?: string;
+}
+
+export function Classroom({
+  sessionId,
+  initialStep = 0,
+  persistHandlers,
+  initialQuestion,
+}: ClassroomProps = {}) {
   const [board, setBoard] = useState(emptyBoardState);
   const [visualScene, setVisualScene] = useState<VisualScene>(emptyVisualScene);
   const [visual3dScene, setVisual3dScene] = useState<Visual3DScene>(emptyVisual3DScene);
@@ -79,6 +105,7 @@ export function Classroom() {
   // Objective-based lesson state, owned by the server: the planned stages, the ones already taught
   // and whether the topic has actually been covered. The UI never infers completion itself.
   const [progress, setProgress] = useState<LessonProgressView | null>(null);
+  const [tokenUsage, setTokenUsage] = useState<number | null>(null);
 
   const stepRequestIdRef = useRef(0);
   const askRequestIdRef = useRef(0);
@@ -181,7 +208,7 @@ export function Classroom() {
     return Math.max(covered, declaredIndex);
   }, [progress]);
 
-  const playStoredLessonStep = useCallback((step: TeachingResponse) => {
+const playStoredLessonStep = useCallback((step: TeachingResponse) => {
     const lessonId = lessonIdRef.current;
     activeLessonStepRef.current = step.lesson_step;
     setActiveStepNumber(step.lesson_step);
@@ -231,10 +258,27 @@ export function Classroom() {
     const storedSteps = Array.from(lessonStepsRef.current.values()).filter((candidate) => candidate.lesson_step >= step.next_step).slice(0, 3);
     prefetchTeacher(storedSteps.map((candidate) => ({ lessonId, stepId: candidate.lesson_step, text: candidate.speech, language: languageRef.current })));
     void playQueuedTeacher(lessonId, step.lesson_step);
-    // A batch that repeats its own step number used to mean "the topic is finished". It no longer
-    // does: the batch is not the lesson. Automatic progression continues (advanceContinuous simply
-    // asks for the next batch) until the objective says the topic has been covered.
-  }, [board, playQueuedTeacher, prefetchTeacher, visual3dScene, visualScene]);
+    // Persist lesson step to database
+    if (sessionId && persistHandlers) {
+      persistHandlers.saveLessonSteps([{
+        lesson_step: step.lesson_step,
+        stage_id: step.stage_id,
+        teaching_intent: step.teaching_intent,
+        speech: step.speech,
+        board_actions: step.board_actions,
+        visual_actions: step.visual_actions,
+        visual3d_actions: step.visual3d_actions,
+        pedagogy: step.pedagogy,
+      }]).catch(() => {});
+      // Update session step index. debouncedSave schedules a timer and returns nothing, so it must not
+      // be chained with .catch() — that throws "Cannot read properties of undefined" mid-playback.
+      // It also cannot reject: the async saveSession it eventually calls handles its own errors.
+      persistHandlers.saveSession({
+        current_step_index: step.next_step,
+        current_stage_id: step.stage_id || null,
+      });
+    }
+  }, [board, playQueuedTeacher, prefetchTeacher, visual3dScene, visualScene, sessionId, persistHandlers]);
 
   // Capture the scene a step produced. Runs after React has committed it, which is the only moment the
   // post-step state actually exists.
@@ -441,6 +485,10 @@ export function Classroom() {
         progressRef.current = payload.progress;
         setProgress(payload.progress);
       }
+      // Track token usage
+      if (payload.usage?.totalTokens !== undefined) {
+        setTokenUsage((prev) => (prev ?? 0) + (payload.usage?.totalTokens ?? 0));
+      }
       // Stopped, superseded or restarted: the teaching above is kept, and nothing below plays it.
       if (stepRequestIdRef.current !== requestId) return;
       if (payload.progress?.complete) endContinuous("complete");
@@ -452,6 +500,27 @@ export function Classroom() {
       if (declared && visualMode === "auto") setLessonRepresentation(declared);
       prefetchTeacher(payload.steps.slice(0, 4).map((item) => ({ lessonId: lessonIdRef.current, stepId: item.lesson_step, text: item.speech, language: languageRef.current })));
       playStoredLessonStep(first);
+      // Persist lesson steps to database
+      if (sessionId && persistHandlers) {
+        persistHandlers.saveLessonSteps(payload.steps.map((step) => ({
+          lesson_step: step.lesson_step,
+          stage_id: step.stage_id,
+          teaching_intent: step.teaching_intent,
+          speech: step.speech,
+          board_actions: step.board_actions,
+          visual_actions: step.visual_actions,
+          visual3d_actions: step.visual3d_actions,
+          pedagogy: step.pedagogy,
+        }))).catch(() => {});
+        // Save usage record
+        if (payload.usage?.totalTokens) {
+          persistHandlers.saveUsage({
+            provider: payload.usage ? "unknown" : "unknown",
+            total_tokens: payload.usage.totalTokens,
+            request_type: "lesson",
+          }).catch(() => {});
+        }
+      }
     } catch {
       if (stepRequestIdRef.current !== requestId) return;
       endContinuous("stop");
@@ -462,7 +531,7 @@ export function Classroom() {
       if (inFlightIdRef.current === requestId) inFlightIdRef.current = null;
       if (stepRequestIdRef.current === requestId) setIsLoading(false);
     }
-  }, [board, visualScene, visual3dScene, endContinuous, lessonStep, playStoredLessonStep, prefetchTeacher, stopTeacher]);
+  }, [board, visualScene, visual3dScene, endContinuous, lessonStep, playStoredLessonStep, prefetchTeacher, stopTeacher, sessionId, persistHandlers]);
 
   // Advance a continuous lesson when the CURRENT teacher audio actually finishes (the `ended`
   // event) — never on a timer, and never for stale audio.
@@ -690,6 +759,20 @@ void requestTeachingLesson();
       // Show + speak the answer WITHOUT touching the lesson step, so the lesson is not restarted.
       setSpeech(payload.speech);
       teachingHistoryRef.current = [...teachingHistoryRef.current, payload.speech].slice(-8);
+      // Persist messages to database
+      if (sessionId && persistHandlers) {
+        persistHandlers.saveMessage({
+          role: "user",
+          content: interruption,
+          message_type: "interruption",
+        }).catch(() => {});
+        persistHandlers.saveMessage({
+          role: "assistant",
+          content: payload.speech,
+          message_type: "response",
+          metadata: { lesson_step: step },
+        }).catch(() => {});
+      }
       setBoard((current) => executeBoardActions(current, payload.board_actions));
       // Interruptions may add to the diagram/3D scene but NEVER reset it (visual state is preserved).
       // What they add is TEMPORARY: it belongs to the aside, and the lifecycle removes it as soon as the
@@ -738,7 +821,7 @@ setVisual3dScene((current) => applyVisual3DActions(current, payload.visual3d_act
         setAskInFlight(false);
       }
     }
-  }, [board, visual3dScene, lessonStarted, lessonStep, speakTeacher, stopTeacher, studentQuestion, visualScene]);
+  }, [board, visual3dScene, lessonStarted, lessonStep, speakTeacher, stopTeacher, studentQuestion, visualScene, sessionId, persistHandlers]);
 
   // Changing the language stops the current speech but PRESERVES the board, topic and lesson step,
   // then continues from the current point in the newly selected language (never a restart).
@@ -757,6 +840,21 @@ setVisual3dScene((current) => applyVisual3DActions(current, payload.visual3d_act
   }, [pauseTeacher, resumeTeacher, voiceStatus]);
 
   const paused = voiceStatus === "paused";
+
+  // A topic handed over from the new-lesson screen starts teaching itself, exactly once.
+  //
+  // The guard is a REF and not state because a state guard re-runs on every render of a component that
+  // renders on every board action, and React's development double-invoke would then start a second
+  // lesson on top of the first. A ref survives both, and the lesson that runs is the one the student
+  // asked for.
+  const autoStartedRef = useRef(false);
+  useEffect(() => {
+    if (autoStartedRef.current) return;
+    const handed = (initialQuestion ?? "").trim();
+    if (!handed) return;
+    autoStartedRef.current = true;
+    startWithTopic(handed);
+  }, [initialQuestion, startWithTopic]);
 
   // The student's note-taking aid: the plan the lesson is being taught against, with every stage
   // they have already been taught ticked. It exists so the student can see how far the lesson has to
@@ -846,6 +944,7 @@ setVisual3dScene((current) => applyVisual3DActions(current, payload.visual3d_act
               <div className="live-actions" data-voice-status={voiceStatus}>
                 <button className="ghost-action" onClick={togglePause} disabled={voiceStatus !== "speaking" && !paused}>{paused ? "Resume" : "Pause"}</button>
                 <button className="stop-action" onClick={stopTeaching}>Stop</button>
+                <span className="token-usage">{formatTokenUsage(tokenUsage)}</span>
               </div>
               {!continuousTeaching && !lessonState.objectiveComplete && !isLoading && <button className="primary-action continue-action" onClick={continueTeaching}>Continue teaching</button>}
               {/* ONE source of truth. "Lesson complete" is only ever shown when the objective is covered

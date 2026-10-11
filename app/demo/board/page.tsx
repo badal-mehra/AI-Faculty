@@ -17,7 +17,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { DiagramRenderer } from "../../../components/visual/DiagramRenderer";
-import { composeStepScene, settleVisualScene } from "../../../lib/visual/engine";
+import {  settleVisualScene } from "../../../lib/visual/engine";
 import type { VisualQualityReport } from "../../../lib/visual/quality";
 import { repairVisualActions } from "../../../lib/visual/validate";
 import { emptyVisualScene } from "../../../lib/visual/types";
