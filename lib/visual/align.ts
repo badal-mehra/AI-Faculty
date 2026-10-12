@@ -142,6 +142,17 @@ export function findAlignmentViolations(constraints: readonly AlignmentConstrain
   return violations;
 }
 
+/** The largest drift across all constraints, for the diagnostics overlay. */
+export function maxDrift(constraints: readonly AlignmentConstraint[], objects: readonly VisualObject[]): number {
+  const byId = new Map(objects.map((object) => [object.id, object]));
+  let worst = 0;
+  for (const constraint of constraints) {
+    const { drift } = constraintDrift(constraint, byId);
+    if (drift > worst) worst = drift;
+  }
+  return worst;
+}
+
 /**
  * The board's alignment, 0-100.
  *

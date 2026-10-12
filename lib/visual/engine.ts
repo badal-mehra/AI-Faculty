@@ -26,13 +26,13 @@ import { MAX_OBJECTS, MIN_OBJECT_SIZE, DIAGRAM_WIDTH, VISUAL_MARGIN } from "./ty
 import {
   boxOf, boxOfObject, boxesOverlap, clamp, clampOffset, clampSize, connectionEndpoints, connectionLabelPoint,
   connectionsBetween, fitLaneOffset, findFreeSpot, findObject, nextLaneOffset, overlapArea, parkingSpot,
-  resolvePlacement, sidePoint, VIEWPORT,
+  resolvePlacement, sidePoint, VIEWPORT, setLayoutViewport,
 } from "./geometry";
 import type { Box } from "./geometry";
 import { buildTimeline } from "./timeline";
 import { measureText, shapeSizeForText } from "./measure";
 import { normaliseFormula } from "./formula";
-import { compileArray, compileCodeBlock, compileStructure } from "./layout";
+import { compileArray, compileCodeBlock, compileStructure, syncLayoutViewport } from "./layout";
 import { applyAttention, applyLifecycle, Retirement, stampNewObjects, StepVisualContext } from "./lifecycle";
 import { semanticKey } from "./semantics";
 import { relationConnector } from "./semantics";
@@ -171,13 +171,13 @@ function shapeFontSize(object: { width: number; height: number; fontSize?: numbe
 /** Estimated box of a free-standing text, measured from the font. Capped by the BOARD, not by the
  *  object limit: clamping to the object limit would make the engine believe a long caption is
  *  narrower than it paints, which is how text ends up drawn over a shape. */
-const MAX_TEXT_BOX_WIDTH = DIAGRAM_WIDTH - 2 * VISUAL_MARGIN;
+const MAX_TEXT_BOX_WIDTH = () => VIEWPORT.width - 2 * VIEWPORT.margin;
 
-function textBox(text: string, fontSize: number, maxWidth = MAX_TEXT_BOX_WIDTH): { width: number; height: number; lines: string[] } {
+function textBox(text: string, fontSize: number, maxWidth = MAX_TEXT_BOX_WIDTH()): { width: number; height: number; lines: string[] } {
   const measured = measureText(text, fontSize, maxWidth, { maxLines: 4 });
   const lines = measured.lines.length > 0 ? measured.lines : [text.trim()];
   return {
-    width: Math.min(MAX_TEXT_BOX_WIDTH, Math.max(24, measured.width + fontSize * 0.3)),
+    width: Math.min(MAX_TEXT_BOX_WIDTH(), Math.max(24, measured.width + fontSize * 0.3)),
     height: Math.max(MIN_OBJECT_SIZE, measured.height),
     lines,
   };
@@ -608,8 +608,8 @@ export function resolveSceneOverlaps(scene: VisualScene): VisualScene {
           ? { x: pb.x + direction * overlapX, y: pb.y }
           : { x: pb.x, y: pb.y + (pa.y <= pb.y ? 1 : -1) * overlapY });
         const clamped = positions.get(b.id)!;
-        const hw = Math.min(b.width / 2, VIEWPORT.width / 2 - VISUAL_MARGIN);
-        const hh = Math.min(b.height / 2, VIEWPORT.height / 2 - VISUAL_MARGIN);
+        const hw = Math.min(b.width / 2, VIEWPORT.width / 2 - VIEWPORT.margin);
+        const hh = Math.min(b.height / 2, VIEWPORT.height / 2 - VIEWPORT.margin);
         positions.set(b.id, {
           x: clamp(clamped.x, VIEWPORT.margin + hw, VIEWPORT.width - VIEWPORT.margin - hw),
           y: clamp(clamped.y, VIEWPORT.margin + hh, VIEWPORT.height - VIEWPORT.margin - hh),
@@ -867,7 +867,11 @@ function updateArrayInScene(
  * Replaces semantic structure actions with the primitives the reducer already understands. Layout
  * is computed here, from the live scene where it matters, and the emitted coordinates are final.
  */
-export function lowerVisualActions(scene: VisualScene, actions: VisualAction[]): { actions: VisualAction[]; diagnostics: VisualActionDiagnostic[] } {
+export function lowerVisualActions(scene: VisualScene, actions: VisualAction[], viewport?: import("./viewport").VisualViewport): { actions: VisualAction[]; diagnostics: VisualActionDiagnostic[] } {
+  if (viewport) {
+    setLayoutViewport(viewport);
+    syncLayoutViewport();
+  }
   const out: VisualAction[] = [];
   const diagnostics: VisualActionDiagnostic[] = [];
   actions.forEach((action, index) => {
@@ -911,7 +915,7 @@ export function applyVisualActionsDetailed(
   actions: VisualAction[],
   context: StepVisualContext = {},
 ): { scene: VisualScene; applied: number; diagnostics: VisualActionDiagnostic[]; retired: Retirement[] } {
-  const lowered = lowerVisualActions(scene, actions);
+  const lowered = lowerVisualActions(scene, actions, context.viewport);
   const timeline = buildTimeline(lowered.actions);
   const diagnostics = [...lowered.diagnostics];
   let applied = 0;

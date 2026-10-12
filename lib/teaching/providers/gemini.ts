@@ -2,8 +2,9 @@
 // The raw model response is always pushed through the shared parseTeachingResponse()
 // validation so an unvalidated payload can never reach the board engine.
 import { GoogleGenAI, Type } from "@google/genai";
-import { TeachingLessonResponse, TeachingRequest, TeachingResponse } from "../types";
+import { TeachingLessonResponse, TeachingRequest, TeachingResponse, ProviderTokenUsage } from "../types";
 import { parseAllTeachingSteps, parseTeachingResponse, describeMalformedLessonSteps } from "../validation";
+import { sumUsage, usageField } from "../usage";
 import { ANIMATION_KINDS, ANCHORS, ARROW_STYLES, CONNECTOR_KINDS, RELATIVE_SIDES, SEMANTIC_KINDS, SEMANTIC_RELATIONS, SHAPE_KINDS, VISUAL_ACTION_TYPES, VISUAL_ROLES, VISUAL_THEMES } from "../../visual/types";
 import { OBJECT3D_ANIMATION_KINDS, OBJECT3D_TYPES, RELATION_TYPES_3D, RELATIVE_SIDES_3D, PLACEMENT_ANCHORS_3D, VISUAL3D_ACTION_TYPES, FLOW_SHAPES, FLOW_CURVES, LABEL_SIDES, VECTOR_KINDS } from "../../visual3d/types";
 import { RequestPlan } from "../requestPlan";
@@ -403,6 +404,26 @@ export async function availableGeminiTeachingModels(): Promise<string[]> {
   return usable.length > 0 ? usable : configured;
 }
 
+/**
+ * THE USAGE GEMINI REPORTED FOR A CALL, verbatim.
+ *
+ * Read from `GenerateContentResponse.usageMetadata` — `promptTokenCount`, `candidatesTokenCount` and
+ * `totalTokenCount`. The whole metadata object is optional and each count is independent, so an absent
+ * object and an absent field both map to "not reported" rather than to a number, matching the rule that a
+ * token count may only come from something a provider actually reported.
+ */
+export function usageFromGeminiResponse(
+  response: { usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number; totalTokenCount?: number } | null | undefined },
+): ProviderTokenUsage | undefined {
+  const meta = response.usageMetadata;
+  if (!meta) return undefined;
+  const result: ProviderTokenUsage = {};
+  if (meta.promptTokenCount !== undefined) result.inputTokens = meta.promptTokenCount;
+  if (meta.candidatesTokenCount !== undefined) result.outputTokens = meta.candidatesTokenCount;
+  if (meta.totalTokenCount !== undefined) result.totalTokens = meta.totalTokenCount;
+  return result;
+}
+
 async function callGemini(
   lesson: TeachingRequest,
   plan: RequestPlan,
@@ -410,7 +431,7 @@ async function callGemini(
   path: "lesson" | "step",
   schema: unknown,
   correction?: string,
-): Promise<unknown> {
+): Promise<{ json: unknown; usage: ProviderTokenUsage | undefined }> {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const response = await withProviderTimeout(
     "gemini",
@@ -433,11 +454,13 @@ async function callGemini(
   );
   const text = response.text;
   if (!text) throw new ProviderError("gemini", "Gemini returned an empty response.", { status: 502, transient: true });
+  let json: unknown;
   try {
-    return JSON.parse(text);
+    json = JSON.parse(text);
   } catch {
     throw new ProviderError("gemini", "Gemini returned an invalid structured response.", { status: 502, transient: true });
   }
+  return { json, usage: usageFromGeminiResponse(response) };
 }
 
 export async function generateTeachingStepWithGemini(lesson: TeachingRequest, model: string, plan: RequestPlan): Promise<TeachingResponse> {
@@ -448,10 +471,14 @@ export async function generateTeachingStepWithGemini(lesson: TeachingRequest, mo
   try {
     // One bounded repair attempt: an invalid field costs a repair turn, not the whole lesson.
     let correction: string | undefined;
+    // Both turns count. The rejected one spent tokens to be thrown away, and a total that only counted
+    // the turn that survived would understate what the request actually cost.
+    const usageAttempts: (ProviderTokenUsage | undefined)[] = [];
     for (let attempt = 1; attempt <= 2; attempt += 1) {
-      const raw = await callGemini(lesson, plan, model, "step", geminiTeachingSchema, correction);
+      const { json: raw, usage } = await callGemini(lesson, plan, model, "step", geminiTeachingSchema, correction);
+      usageAttempts.push(usage);
       const teachingResponse = parseTeachingResponse(raw);
-      if (teachingResponse) return teachingResponse;
+      if (teachingResponse) return { ...teachingResponse, ...usageField(sumUsage(usageAttempts)) };
       if (attempt === 2) throw new ProviderError("gemini", "Gemini returned unsupported board instructions.", { status: 502, transient: true });
       console.warn("[Gemini] step response rejected by validation; sending one corrected retry");
       correction = repairTurn(raw);
@@ -465,8 +492,8 @@ export async function generateTeachingStepWithGemini(lesson: TeachingRequest, mo
 export async function generateTeachingLessonWithGemini(lesson: TeachingRequest, model: string, plan: RequestPlan): Promise<TeachingLessonResponse> {
   if (!process.env.GEMINI_API_KEY) throw new ProviderError("gemini", "Gemini is not configured on this server.", { status: 503, transient: false, configuration: true });
 
-  try {
-    const raw = await callGemini(lesson, plan, model, "lesson", geminiTeachingLessonSchema);
+   try {
+    const { json: raw, usage } = await callGemini(lesson, plan, model, "lesson", geminiTeachingLessonSchema);
     // A malformed step is dropped, not the whole batch: six good teaching steps are worth far more
     // than a failover chain, and the classroom re-teaches the dropped stage in the next batch.
     const steps = parseAllTeachingSteps(raw);
@@ -475,7 +502,8 @@ export async function generateTeachingLessonWithGemini(lesson: TeachingRequest, 
     if (process.env.NODE_ENV !== "production" && steps.length < requested) {
       console.warn(`[Gemini] ${requested - steps.length} malformed lesson step(s) dropped; keeping ${steps.length}: ${describeMalformedLessonSteps(raw).join("; ")}`);
     }
-    return { steps };
+    // Batch-level usage: a lesson request is one call that happens to return several steps.
+    return { steps, ...usageField(sumUsage([usage])) };
   } catch (error) {
     throw asProviderError(error, "gemini");
   }

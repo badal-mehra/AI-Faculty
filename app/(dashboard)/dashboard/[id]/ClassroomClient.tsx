@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ClassroomCore } from "./ClassroomCore";
+import type { TeachingResponse } from "@/lib/teaching/types";
 
 interface ClassroomClientProps {
   initialSession: {
@@ -117,21 +118,31 @@ export default function ClassroomClient({ initialSession, initialQuestion }: Cla
     if (!session) return;
 
     try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from("usage_records")
-        .insert({
-          user_id: user.id,
+      // The usage_records table has no INSERT policy for users (the migration says records are
+      // created server-side only), so the write goes through /api/usage, which authenticates
+      // the caller, verifies session ownership and inserts with the service role.
+      const response = await fetch("/api/usage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           session_id: session.id,
-          ...usage,
-        });
+          provider: usage.provider,
+          model: usage.model ?? null,
+          input_tokens: usage.input_tokens,
+          output_tokens: usage.output_tokens,
+          total_tokens: usage.total_tokens,
+          request_type: usage.request_type ?? "step",
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error((payload as { message?: string }).message ?? `usage write failed (${response.status})`);
+      }
     } catch (error) {
-      console.error("Failed to save usage:", error);
+      // A failed write must not be reported as successful. The caller (Classroom.tsx) already
+      // swallows the rejection, so the message is logged here for diagnosis.
+      console.error("Failed to save usage:", error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -142,6 +153,42 @@ export default function ClassroomClient({ initialSession, initialQuestion }: Cla
     saveUsage,
     setSaveError,
   };
+
+  // Fetch saved lesson steps so a reopened lesson can be restored exactly.
+  const [savedSteps, setSavedSteps] = useState<TeachingResponse[]>([]);
+  useEffect(() => {
+    if (!initialSession.id) return;
+    const fetchSteps = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("lesson_steps")
+          .select("*")
+          .eq("session_id", initialSession.id)
+          .order("step_index", { ascending: true });
+        if (error) throw error;
+        // Map DB columns back to the API's TeachingResponse shape.
+        setSavedSteps((data ?? []).map((row: any, idx: number, arr: any[]): TeachingResponse => {
+          const stepIndex = row.step_index;
+          const isLast = idx === arr.length - 1;
+          return {
+            lesson_step: stepIndex,
+            stage_id: row.stage_id ?? undefined,
+            teaching_intent: row.stage_intent ?? undefined,
+            speech: row.speech,
+            board_actions: row.board_actions ?? [],
+            visual_actions: row.visual_actions ?? [],
+            visual3d_actions: row.visual3d_actions ?? [],
+            pedagogy: row.pedagogy ?? undefined,
+            next_step: isLast ? stepIndex : stepIndex + 1,
+          };
+        }));
+      } catch (err) {
+        console.error("Failed to fetch saved steps:", err);
+      }
+    };
+    void fetchSteps();
+  }, [initialSession.id]);
 
   useEffect(() => {
     return () => {
@@ -155,6 +202,7 @@ export default function ClassroomClient({ initialSession, initialQuestion }: Cla
     <ClassroomCore
       session={session}
       persistHandlers={persistHandlers}
+      savedSteps={savedSteps}
       isSaving={isSaving}
       saveError={saveError}
       initialQuestion={initialQuestion}

@@ -157,6 +157,10 @@ export type TeachingResponse = {
    * filled in from an estimate.
    */
   usage?: ProviderTokenUsage;
+  /** Which provider answered this step, so the classroom can record it in usage records. */
+  provider?: string;
+  /** The model that answered this step, for usage attribution. */
+  model?: string;
 };
 
 export type TeachingLessonResponse = {
@@ -175,4 +179,8 @@ export type TeachingLessonResponse = {
    * splitting the figure across them would be inventing precision the provider never reported.
    */
   usage?: ProviderTokenUsage;
+  /** Which provider answered this batch, so the classroom can record it in usage records. */
+  provider?: string;
+  /** The model that answered this batch, for usage attribution. */
+  model?: string;
 };

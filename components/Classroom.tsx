@@ -61,6 +61,13 @@ interface ClassroomProps {
    * created FROM that question and the board they came to see is the answer to it.
    */
   initialQuestion?: string;
+  /** Previously persisted board/visual state, used to restore a lesson that was already started. */
+  initialBoardState?: BoardState;
+  initialVisualState?: VisualScene;
+  initialVisual3dState?: Visual3DScene;
+  /** Saved lesson steps to replay on load, restoring a half-finished lesson exactly. */
+  initialSteps?: TeachingResponse[];
+  initialProgress?: LessonProgressView | null;
 }
 
 export function Classroom({
@@ -68,10 +75,15 @@ export function Classroom({
   initialStep = 0,
   persistHandlers,
   initialQuestion,
+  initialBoardState,
+  initialVisualState,
+  initialVisual3dState,
+  initialSteps,
+  initialProgress,
 }: ClassroomProps = {}) {
-  const [board, setBoard] = useState(emptyBoardState);
-  const [visualScene, setVisualScene] = useState<VisualScene>(emptyVisualScene);
-  const [visual3dScene, setVisual3dScene] = useState<Visual3DScene>(emptyVisual3DScene);
+  const [board, setBoard] = useState<BoardState>(initialBoardState ?? emptyBoardState);
+  const [visualScene, setVisualScene] = useState<VisualScene>(initialVisualState ?? emptyVisualScene);
+  const [visual3dScene, setVisual3dScene] = useState<Visual3DScene>(initialVisual3dState ?? emptyVisual3DScene);
   const [visualMode, setVisualMode] = useState<VisualMode>("auto");
   // The stage the PIPELINE chose, learned from the first batch. Auto must not decide this by asking
   // "has any step so far contained a 3D action": that test flips mid-lesson, and a lesson that switched
@@ -88,23 +100,23 @@ export function Classroom({
   const [activeQuestion, setActiveQuestion] = useState("");
   const [language, setLanguage] = useState<TeachingLanguage>("English");
   const [studentQuestion, setStudentQuestion] = useState("");
-  const [lessonStep, setLessonStep] = useState(1);
+  const [lessonStep, setLessonStep] = useState(initialQuestion ? 1 : initialStep);
   // Mirrors `activeLessonStepRef` in state so the step controls re-render when the lesson moves. Reading
   // the ref during render would work only because every step change happens to set some other state.
-  const [activeStepNumber, setActiveStepNumber] = useState<number | null>(null);
+  const [activeStepNumber, setActiveStepNumber] = useState<number | null>(initialQuestion ? null : initialStep);
   const [isLoading, setIsLoading] = useState(false);
   // Question availability is INDEPENDENT of lesson playback: the student can ask while a lesson
   // plays and after it completes, as long as the session (lessonStarted) still exists.
   const [askInFlight, setAskInFlight] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [continuousTeaching, setContinuousTeaching] = useState(false);
-  const [lessonStarted, setLessonStarted] = useState(false);
+  const [lessonStarted, setLessonStarted] = useState(!!initialSteps && initialSteps.length > 0);
   // The teacher stopped adding steps. Whether the LESSON is finished is derived, not set here.
   const [teacherFinished, setTeacherFinished] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
   // Objective-based lesson state, owned by the server: the planned stages, the ones already taught
   // and whether the topic has actually been covered. The UI never infers completion itself.
-  const [progress, setProgress] = useState<LessonProgressView | null>(null);
+  const [progress, setProgress] = useState<LessonProgressView | null>(initialProgress ?? null);
   const [tokenUsage, setTokenUsage] = useState<number | null>(null);
 
   const stepRequestIdRef = useRef(0);
@@ -126,7 +138,7 @@ export function Classroom({
   // A replay restores the pre-step scene now and re-applies the step on the next commit, so the step is
   // applied to its own starting scene rather than to the one it already built.
   const pendingReplayRef = useRef<TeachingResponse | null>(null);
-  const progressRef = useRef<LessonProgressView | null>(null);
+  const progressRef = useRef<LessonProgressView | null>(initialProgress ?? null);
   const questionRef = useRef("");
   const languageRef = useRef<TeachingLanguage>("English");
   // Read inside request callbacks, which capture an empty dependency list on purpose: they must always
@@ -258,7 +270,7 @@ const playStoredLessonStep = useCallback((step: TeachingResponse) => {
     const storedSteps = Array.from(lessonStepsRef.current.values()).filter((candidate) => candidate.lesson_step >= step.next_step).slice(0, 3);
     prefetchTeacher(storedSteps.map((candidate) => ({ lessonId, stepId: candidate.lesson_step, text: candidate.speech, language: languageRef.current })));
     void playQueuedTeacher(lessonId, step.lesson_step);
-    // Persist lesson step to database
+    // Persist lesson step and session state to database
     if (sessionId && persistHandlers) {
       persistHandlers.saveLessonSteps([{
         lesson_step: step.lesson_step,
@@ -270,12 +282,14 @@ const playStoredLessonStep = useCallback((step: TeachingResponse) => {
         visual3d_actions: step.visual3d_actions,
         pedagogy: step.pedagogy,
       }]).catch(() => {});
-      // Update session step index. debouncedSave schedules a timer and returns nothing, so it must not
-      // be chained with .catch() — that throws "Cannot read properties of undefined" mid-playback.
-      // It also cannot reject: the async saveSession it eventually calls handles its own errors.
+      // Update session step index and current board/visual state so a refresh restores the board.
       persistHandlers.saveSession({
         current_step_index: step.next_step,
         current_stage_id: step.stage_id || null,
+        board_state: getBoardState(board),
+        visual_state: getVisualScene(visualScene),
+        visual3d_state: getVisual3DScene(visual3dScene),
+        lesson_objective: progressRef.current ?? null,
       });
     }
   }, [board, playQueuedTeacher, prefetchTeacher, visual3dScene, visualScene, sessionId, persistHandlers]);
@@ -515,7 +529,10 @@ const playStoredLessonStep = useCallback((step: TeachingResponse) => {
         // Save usage record
         if (payload.usage?.totalTokens) {
           persistHandlers.saveUsage({
-            provider: payload.usage ? "unknown" : "unknown",
+            provider: payload.provider ?? "unknown",
+            model: payload.model ?? null,
+            input_tokens: payload.usage.inputTokens,
+            output_tokens: payload.usage.outputTokens,
             total_tokens: payload.usage.totalTokens,
             request_type: "lesson",
           }).catch(() => {});
@@ -772,6 +789,17 @@ void requestTeachingLesson();
           message_type: "response",
           metadata: { lesson_step: step },
         }).catch(() => {});
+        // Save usage record for the follow-up answer
+        if (payload.usage?.totalTokens) {
+          persistHandlers.saveUsage({
+            provider: payload.provider ?? "unknown",
+            model: payload.model ?? null,
+            input_tokens: payload.usage.inputTokens,
+            output_tokens: payload.usage.outputTokens,
+            total_tokens: payload.usage.totalTokens,
+            request_type: "interruption",
+          }).catch(() => {});
+        }
       }
       setBoard((current) => executeBoardActions(current, payload.board_actions));
       // Interruptions may add to the diagram/3D scene but NEVER reset it (visual state is preserved).
@@ -855,6 +883,25 @@ setVisual3dScene((current) => applyVisual3DActions(current, payload.visual3d_act
     autoStartedRef.current = true;
     startWithTopic(handed);
   }, [initialQuestion, startWithTopic]);
+
+  // Restore a previously saved lesson: load the saved steps into the refs and set the active step.
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    if (restoredRef.current) return;
+    if (!initialSteps || initialSteps.length === 0) return;
+    restoredRef.current = true;
+    // Populate the step map so navigation (back/forward) and prefetching work immediately.
+    lessonStepsRef.current = new Map(initialSteps.map((step) => [step.lesson_step, step]));
+    activeLessonStepRef.current = initialStep;
+    // Mark the lesson as already started so the student can ask questions and navigate.
+    // They can press "play" to continue from the current step, or start fresh.
+    setLessonStarted(true);
+    // If the last saved step doesn't point forward, the lesson is finished.
+    const lastStep = initialSteps[initialSteps.length - 1];
+    if (lastStep && lastStep.next_step <= lastStep.lesson_step) {
+      setTeacherFinished(true);
+    }
+  }, [initialSteps, initialStep, requestTeachingLesson]);
 
   // The student's note-taking aid: the plan the lesson is being taught against, with every stage
   // they have already been taught ticked. It exists so the student can see how far the lesson has to

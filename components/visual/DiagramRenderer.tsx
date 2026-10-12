@@ -495,7 +495,11 @@ function DiagramRendererImpl({ scene, focusId, onSelectObject, animating = true,
     }
     // The frame is the BOARD, and the drawing is centred in it on BOTH axes: a short structure (a
     // four-cell array) sits in the middle of the board rather than at the top with two thirds empty.
-    return { x: Math.min(0, left - margin), y: Math.min(0, top - margin), w: Math.max(w, right - left + margin * 2), h: Math.max(h, bottom - top + margin * 2) };
+    const finalW = Math.max(w, right - left + margin * 2);
+    const finalH = Math.max(h, bottom - top + margin * 2);
+    const contentCenterX = (left + right) / 2;
+    const contentCenterY = (top + bottom) / 2;
+    return { x: contentCenterX - finalW / 2, y: contentCenterY - finalH / 2, w: finalW, h: finalH };
   }, [scene.objects, scene.viewport, stage]);
 
   // Focus must NEVER crop the board. The whole scene stays framed at all times; pointing at one object

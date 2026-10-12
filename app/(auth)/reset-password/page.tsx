@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { safeRedirectPath } from "@/lib/redirect";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+  const redirectTo = safeRedirectPath(searchParams.get("redirectTo"));
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

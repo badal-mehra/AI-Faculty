@@ -17,9 +17,18 @@ import {
   DIAGRAM_HEIGHT, DIAGRAM_WIDTH, MAX_ARROW_OFFSET, MAX_OBJECT_SIZE, MIN_OBJECT_SIZE, VISUAL_MARGIN,
   Anchor, Point, SemanticRelation, VisualObject, VisualObjectKind, VisualPlacement,
 } from "./types";
+export type { Point } from "./types";
 import { relationLayout } from "./semantics";
 
 export const VIEWPORT = { width: DIAGRAM_WIDTH, height: DIAGRAM_HEIGHT, margin: VISUAL_MARGIN };
+
+export function setLayoutViewport(viewport: { width: number; height: number; margin: number } | undefined): void {
+  const v = viewport ?? { width: DIAGRAM_WIDTH, height: DIAGRAM_HEIGHT, margin: VISUAL_MARGIN };
+  VIEWPORT.width = v.width;
+  VIEWPORT.height = v.height;
+  VIEWPORT.margin = v.margin;
+  recomputeAutoSlots();
+}
 
 export const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 
@@ -28,12 +37,12 @@ export const clampSize = (value: number): number => clamp(value, MIN_OBJECT_SIZE
 export const clampOffset = (value: number): number => clamp(value, -MAX_ARROW_OFFSET, MAX_ARROW_OFFSET);
 
 // Clamp an object centre so its full box (plus margin) stays inside the viewport.
-export function clampCenter(point: Point, halfWidth: number, halfHeight: number): Point {
-  const hw = clamp(halfWidth, 0, VIEWPORT.width / 2 - VIEWPORT.margin);
-  const hh = clamp(halfHeight, 0, VIEWPORT.height / 2 - VIEWPORT.margin);
+export function clampCenter(point: Point, halfWidth: number, halfHeight: number, viewport: { width: number; height: number; margin: number } = VIEWPORT): Point {
+  const hw = clamp(halfWidth, 0, viewport.width / 2 - viewport.margin);
+  const hh = clamp(halfHeight, 0, viewport.height / 2 - viewport.margin);
   return {
-    x: clamp(point.x, VIEWPORT.margin + hw, VIEWPORT.width - VIEWPORT.margin - hw),
-    y: clamp(point.y, VIEWPORT.margin + hh, VIEWPORT.height - VIEWPORT.margin - hh),
+    x: clamp(point.x, viewport.margin + hw, viewport.width - viewport.margin - hw),
+    y: clamp(point.y, viewport.margin + hh, viewport.height - viewport.margin - hh),
   };
 }
 
@@ -104,7 +113,8 @@ export function isBoxFree(box: Box, objects: VisualObject[], ignore: string[] = 
 
 // Preferred positions for objects the model did NOT place. Deterministic and well spread: the
 // first object takes the centre, later ones fan out to the viewport edges before spreading further.
-const AUTO_SLOTS: Point[] = [
+// Recomputed by setLayoutViewport when the measured board size changes.
+let AUTO_SLOTS: Point[] = [
   { x: VIEWPORT.width / 2, y: VIEWPORT.height / 2 },
   { x: VIEWPORT.margin + 60, y: VIEWPORT.height / 2 },
   { x: VIEWPORT.width - VISUAL_MARGIN - 60, y: VIEWPORT.height / 2 },
@@ -115,6 +125,20 @@ const AUTO_SLOTS: Point[] = [
   { x: VISUAL_MARGIN + 60, y: VIEWPORT.height - VISUAL_MARGIN - 50 },
   { x: VIEWPORT.width - VISUAL_MARGIN - 60, y: VIEWPORT.height - VISUAL_MARGIN - 50 },
 ];
+
+function recomputeAutoSlots(): void {
+  AUTO_SLOTS = [
+    { x: VIEWPORT.width / 2, y: VIEWPORT.height / 2 },
+    { x: VIEWPORT.margin + 60, y: VIEWPORT.height / 2 },
+    { x: VIEWPORT.width - VISUAL_MARGIN - 60, y: VIEWPORT.height / 2 },
+    { x: VIEWPORT.width / 2, y: VISUAL_MARGIN + 50 },
+    { x: VIEWPORT.width / 2, y: VIEWPORT.height - VISUAL_MARGIN - 50 },
+    { x: VISUAL_MARGIN + 60, y: VISUAL_MARGIN + 50 },
+    { x: VIEWPORT.width - VISUAL_MARGIN - 60, y: VISUAL_MARGIN + 50 },
+    { x: VISUAL_MARGIN + 60, y: VIEWPORT.height - VISUAL_MARGIN - 50 },
+    { x: VIEWPORT.width - VISUAL_MARGIN - 60, y: VIEWPORT.height - VISUAL_MARGIN - 50 },
+  ];
+}
 
 export const autoSlotPoint = (index: number): Point => AUTO_SLOTS[index % AUTO_SLOTS.length];
 

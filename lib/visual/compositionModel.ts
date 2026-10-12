@@ -29,8 +29,27 @@
 // expressible as "place twenty rectangles and hope".
 import { boxOfObject, boxesOverlap, type Box, sideForRelation } from "./geometry";
 import { constraintsForStructure, type AlignmentConstraint } from "./align";
-import { spacingScale, space } from "./spacing";
-import type { VisualObject } from "./types";
+import { spacingScale, space, SPACE, type SPACE_TIERS } from "./spacing";
+import type { VisualObject, VisualViewport } from "./types";
+
+/** The full composition type returned by `buildComposition`. */
+export type Composition = {
+  kind: string;
+  parentId: string | null;
+  groupId: string;
+  role: string;
+  objects: VisualObject[];
+  primary: VisualObject[];
+  secondary: VisualObject[];
+  annotations: VisualObject[];
+  relationships: Array<{ id: string; from: string; to: string; relation: string }>;
+  readingDirection: string;
+  alignment: AlignmentConstraint[];
+  spacing: Record<string, number>;
+  viewportPriority: string[];
+  teachingIntent?: string;
+  subject?: string;
+};
 
 /** The teaching intents, named as the classroom names them. */
 const INTENT_FORMS: Record<string, string> = {
@@ -304,25 +323,25 @@ interface BuildCompositionOptions {
 }
 
 /** Builds a composition from the objects of one structure group. */
-export function buildComposition(options: BuildCompositionOptions): any {
-    const kind = compositionKindFor({ objects: options.objects, ...(options.explicitKind ? { explicitKind: options.explicitKind } : {}), ...(options.teachingIntent ? { teachingIntent: options.teachingIntent } : {}), ...(options.domain ? { domain: options.domain } : {}) });
-    const roles = classifyRoles(options.objects);
-    const relationships = relationshipsOf(options.objects);
-    const composition = {
-        kind,
-        parentId: options.parentId ?? null,
-        groupId: options.groupId,
-        role: options.role ?? "root",
-        objects: [...options.objects],
-        primary: roles.primary,
-        secondary: roles.secondary,
-        annotations: roles.annotations,
-        relationships,
-        readingDirection: READING[kind],
-        // A tree is aligned LEVEL BY LEVEL, not as one row, so its own depth lines are the constraint.
-        alignment: constraintsForStructure(kind, structureIdList(options.objects, kind)),
-        spacing: spacingScale(options.viewport),
-        viewportPriority: [],
+export function buildComposition(options: BuildCompositionOptions): Composition {
+  const kind = compositionKindFor({ objects: options.objects, ...(options.explicitKind ? { explicitKind: options.explicitKind } : {}), ...(options.teachingIntent ? { teachingIntent: options.teachingIntent } : {}), ...(options.domain ? { domain: options.domain } : {}) });
+  const roles = classifyRoles(options.objects);
+  const relationships = relationshipsOf(options.objects);
+  const composition: Composition = {
+    kind,
+    parentId: options.parentId ?? null,
+    groupId: options.groupId,
+    role: options.role ?? "root",
+    objects: [...options.objects],
+    primary: roles.primary,
+    secondary: roles.secondary,
+    annotations: roles.annotations,
+    relationships,
+    readingDirection: READING[kind],
+    // A tree is aligned LEVEL BY LEVEL, not as one row, so its own depth lines are the constraint.
+    alignment: constraintsForStructure(kind, structureIdList(options.objects, kind)),
+    spacing: spacingScale(options.viewport),
+    viewportPriority: [],
         ...(options.teachingIntent ? { teachingIntent: options.teachingIntent } : {}),
         ...(options.domain ? { subject: options.domain } : {}),
     };
@@ -351,7 +370,7 @@ export function relationshipsOf(objects: readonly VisualObject[]): Array<{ id: s
  * this wrong is why a comparison and a worked example left standing next to each other read as one
  * confused diagram.
  */
-export function gapBetweenCompositions(a: any, b: any, viewport: { width: number; height: number; margin: number }, tier = "xl"): number {
+export function gapBetweenCompositions(a: any, b: any, viewport: { width: number; height: number; margin: number }, tier: keyof typeof SPACE = "xl"): number {
     const relation = relatedGroups(a, b);
     if (relation)
         return space(viewport, "lg");
