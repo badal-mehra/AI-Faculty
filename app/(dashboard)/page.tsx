@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
+import LessonActions from "./dashboard/LessonActions";
 
 export default async function DashboardPage() {
   const user = await getUser();
@@ -28,12 +29,6 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .order("last_activity_at", { ascending: false })
     .limit(20);
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, preferred_language, teaching_depth")
-    .eq("id", user.id)
-    .single();
 
   return (
     <div className="dashboard-page">
@@ -68,26 +63,7 @@ export default async function DashboardPage() {
                   </div>
                 </Link>
               </div>
-              <div className="lesson-actions">
-                <Link href={`/dashboard/${session.id}`} className="action-button primary">
-                  {session.status === "active" ? "Continue" : "View"}
-                </Link>
-                <button className="action-button secondary" onClick={() => renameSession(session.id, session.title)}>
-                  Rename
-                </button>
-                <button
-                  className="action-button secondary"
-                  onClick={() => archiveSession(session.id, session.status)}
-                >
-                  {session.status === "archived" ? "Unarchive" : "Archive"}
-                </button>
-                <button
-                  className="action-button danger"
-                  onClick={() => confirmDelete(session.id, session.title || session.topic)}
-                >
-                  Delete
-                </button>
-              </div>
+              <LessonActions session={session} />
             </article>
           ))}
         </div>
@@ -113,35 +89,4 @@ export default async function DashboardPage() {
       )}
     </div>
   );
-}
-
-async function renameSession(sessionId: string, currentTitle: string) {
-  const newTitle = prompt("Enter new title:", currentTitle);
-  if (!newTitle || newTitle === currentTitle) return;
-
-  const supabase = await createClient();
-  await supabase.from("teaching_sessions").update({ title: newTitle }).eq("id", sessionId);
-  window.location.reload();
-}
-
-async function archiveSession(sessionId: string, currentStatus: string) {
-  const supabase = await createClient();
-  const newStatus = currentStatus === "archived" ? "active" : "archived";
-  await supabase
-    .from("teaching_sessions")
-    .update({ status: newStatus, archived_at: newStatus === "archived" ? new Date().toISOString() : null })
-    .eq("id", sessionId);
-  window.location.reload();
-}
-
-function confirmDelete(sessionId: string, title: string) {
-  if (confirm(`Delete "${title}"? This cannot be undone.`)) {
-    deleteSession(sessionId);
-  }
-}
-
-async function deleteSession(sessionId: string) {
-  const supabase = await createClient();
-  await supabase.from("teaching_sessions").delete().eq("id", sessionId);
-  window.location.reload();
 }

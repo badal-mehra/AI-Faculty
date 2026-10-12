@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
 import { safeRedirectPath } from "@/lib/redirect";
@@ -81,7 +82,7 @@ export default function ForgotPasswordPage() {
         </form>
 
         <p className="auth-footer">
-          <a href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}>Back to Sign In</a>
+          <Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}>Back to Sign In</Link>
         </p>
       </div>
     </div>

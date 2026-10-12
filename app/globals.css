@@ -1,8 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
 
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+  /* ---- Shared design tokens -------------------------------------------------
+     Single source of truth for the shared surfaces (auth, dashboard chrome,
+     classroom chrome). The diagram viewport keeps its own hand-tuned theme
+     variables and is NOT rewritten here, so its quality-gated rendering stays
+     identical. */
+  --color-bg: #10141a;            /* page / app background */
+  --color-surface: #152522;       /* cards, panels, sidebar */
+  --color-surface-strong: #171e22;/* deeper panel background */
+  --color-panel: #14201d;         /* form fields, control tiles */
+  --color-border: #40524e;        /* surface dividers */
+  --color-border-strong: #3a514a; /* input / tile borders */
+  --color-border-stronger: #293634;
+
+  --color-text: #e9f3ec;          /* primary text */
+  --color-text-secondary: #cddbd5;
+  --color-text-muted: #8d9a9b;
+
+  --color-accent: #93e6ad;        /* primary green */
+  --color-accent-text: #14241a;
+  --color-accent-hover: #2a403a;   /* hover bg under the green */
+
+  --color-success: #b7e8c6;
+  --color-success-bg: #2d4837;
+  --color-success-border: #4d6b56;
+
+  --color-warning: #e9cf8a;
+  --color-warning-bg: #423010;
+  --color-warning-border: #8a7238;
+  --color-warning-strong: #e2c56a;
+
+  --color-error: #f2acb6;
+  --color-error-bg: #4a2c32;
+  --color-error-border: #774952;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 18px;
+  --radius-full: 999px;
+
+  --shadow-panel: 0 20px 60px #0000002d;
+  --shadow-inset: inset 0 1px #ffffff09;
+  --focus-ring: 0 0 0 3px #7ddba12e;
+}
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; background: #10141a; color: #eaf0ee; font-family: Manrope, Arial, sans-serif; }
+body { margin: 0; min-width: 320px; background: var(--color-bg); color: var(--color-text); font-family: Manrope, Arial, sans-serif; }
 button { font: inherit; }
 .classroom { min-height: 100vh; padding: 24px clamp(16px, 4vw, 56px) 42px; background: radial-gradient(circle at 85% 12%, #263d3d 0, transparent 26rem), #10141a; }
 .topbar { max-width: 1440px; margin: 0 auto 26px; display: flex; align-items: center; gap: 12px; color: #eef7f1; }
@@ -51,6 +96,40 @@ button { font: inherit; }
    deliberately NOT the same note as "Lesson complete". */
 .status-note.is-covered { color: #9fd3b4; }.ask-card { margin-top: 18px; padding-top: 16px; border-top: 1px solid #2b3a37; }.ask-card .field-label { margin-top: 0; }.ask-row { display: flex; gap: 8px; }.ask-row input { flex: 1; min-width: 0; border: 1px solid #3a514a; border-radius: 10px; background: #14201d; color: #e9f3ec; font: inherit; font-size: 13px; padding: 10px 12px; outline: none; }.ask-row input::placeholder { color: #6b7d77; }.ask-row input:focus { border-color: #7ddba1; box-shadow: 0 0 0 3px #7ddba12e; }.ask-row button { border: 1px solid #93e6ad; border-radius: 10px; padding: 10px 16px; color: #14241a; background: #93e6ad; font-size: 12.5px; font-weight: 800; cursor: pointer; }.ask-row button:disabled { cursor: default; opacity: .45; }.voice-error { margin: 12px 0 0; color: #ffc98f; font-size: 11.5px; line-height: 1.5; }
 .ask-hint { margin: 8px 0 0; color: #7f918c; font-size: 10.5px; line-height: 1.5; }
+
+/* Classroom live controls — the Pause/Stop/Continue buttons were given semantic class names
+   (ghost/stop/continue) that had NO matching rules, so every live-action button rendered with
+   the generic .live-actions button style and were all identical. Stop is destructive, so it must
+   read as such; Pause is a neutral toggle, rendered as a ghost outline. */
+.live-actions .ghost-action {
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-secondary);
+}
+.live-actions .ghost-action:hover:not(:disabled) {
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+.live-actions .stop-action {
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
+}
+.live-actions .stop-action:hover:not(:disabled) {
+  background: #5a333a;
+}
+.live-actions .ghost-action:focus-visible,
+.live-actions .stop-action:focus-visible {
+  outline: var(--focus-ring-accent);
+  outline-offset: 2px;
+}
+.token-usage {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+  text-align: right;
+}
 
 /* Lesson plan: the outline the teacher is following, so a student can follow along and take notes
    against the same stages instead of guessing how much is left. */
@@ -454,16 +533,16 @@ button { font: inherit; }
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: radial-gradient(circle at 85% 12%, #263d3d 0, transparent 26rem), #10141a;
+  background: radial-gradient(circle at 85% 12%, #263d3d 0, transparent 26rem), var(--color-bg);
 }
 .auth-container {
   width: 100%;
   max-width: 480px;
-  background: #152522;
-  border: 1px solid #40524e;
-  border-radius: 18px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
   padding: 2rem;
-  box-shadow: 0 20px 60px #0000002d;
+  box-shadow: var(--shadow-panel);
 }
 .auth-header {
   text-align: center;
@@ -472,26 +551,26 @@ button { font: inherit; }
 .auth-header h1 {
   margin: 0 0 0.5rem 0;
   font-size: 1.75rem;
-  color: #eef7f1;
+  color: var(--color-text);
 }
 .auth-header p {
   margin: 0;
-  color: #8d9a9b;
+  color: var(--color-text-muted);
 }
 .auth-error {
-  background: #4a2c32;
-  border: 1px solid #774952;
-  color: #f2acb6;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error);
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
 }
 .auth-success {
-  background: #2d4837;
-  border: 1px solid #4d6b56;
-  color: #b7e8c6;
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  color: var(--color-success);
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
 }
 .auth-form {
@@ -510,7 +589,7 @@ button { font: inherit; }
   gap: 1rem;
 }
 .form-group label {
-  color: #8fa19b;
+  color: var(--color-text-tertiary);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
@@ -519,10 +598,10 @@ button { font: inherit; }
 .form-group input,
 .form-group select,
 .form-group textarea {
-  border: 1px solid #3a514a;
-  border-radius: 10px;
-  background: #14201d;
-  color: #e9f3ec;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  color: var(--color-text);
   font: inherit;
   font-size: 0.875rem;
   padding: 0.75rem;
@@ -531,8 +610,8 @@ button { font: inherit; }
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: #7ddba1;
-  box-shadow: 0 0 0 3px #7ddba12e;
+  border-color: var(--color-accent);
+  box-shadow: var(--focus-ring);
 }
 .form-group input:disabled,
 .form-group select:disabled,
@@ -556,9 +635,14 @@ button { font: inherit; }
   border: none;
   cursor: pointer;
   padding: 0.5rem;
+  color: var(--color-text-secondary);
+}
+.password-toggle:focus-visible {
+  outline: var(--focus-ring);
+  border-radius: var(--radius-sm);
 }
 .auth-button {
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   font-weight: 800;
@@ -567,9 +651,9 @@ button { font: inherit; }
   border: 1px solid transparent;
 }
 .auth-button.primary {
-  background: #93e6ad;
-  border-color: #93e6ad;
-  color: #14241a;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 .auth-button.primary:hover:not(:disabled) {
   transform: translateY(-1px);
@@ -578,7 +662,7 @@ button { font: inherit; }
 .auth-button.secondary {
   background: #202c2d;
   border-color: #3a4d49;
-  color: #cddbd5;
+  color: var(--color-text-secondary);
 }
 .auth-button:disabled {
   opacity: 0.6;
@@ -589,7 +673,7 @@ button { font: inherit; }
   margin-top: 1rem;
 }
 .auth-links a {
-  color: #93e6ad;
+  color: var(--color-accent);
   text-decoration: none;
 }
 .auth-links a:hover {
@@ -598,10 +682,10 @@ button { font: inherit; }
 .auth-footer {
   text-align: center;
   margin-top: 1.5rem;
-  color: #8d9a9b;
+  color: var(--color-text-muted);
 }
 .auth-footer a {
-  color: #93e6ad;
+  color: var(--color-accent);
   text-decoration: none;
   font-weight: 600;
 }
@@ -615,11 +699,11 @@ button { font: inherit; }
   display: grid;
   grid-template-columns: 260px 1fr;
   min-height: 100vh;
-  background: #10141a;
+  background: var(--color-bg);
 }
 .dashboard-sidebar {
-  background: #152522;
-  border-right: 1px solid #40524e;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
 }
 .sidebar-nav {
   display: flex;
@@ -632,7 +716,7 @@ button { font: inherit; }
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #eef7f1;
+  color: var(--color-text);
   text-decoration: none;
   font-weight: 800;
   font-size: 1.125rem;
@@ -642,10 +726,11 @@ button { font: inherit; }
   place-items: center;
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 10px;
-  background: #93e6ad;
-  color: #13241b;
+  border-radius: var(--radius-lg);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
   font-weight: 800;
+  box-shadow: 0 0 16px #8ee2ae18;
 }
 .sidebar-menu {
   display: flex;
@@ -661,9 +746,9 @@ button { font: inherit; }
   align-items: center;
   gap: 0.75rem;
   padding: 0.625rem 0.875rem;
-  color: #cddbd5;
+  color: var(--color-text-secondary);
   text-decoration: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: background 0.15s;
   background: none;
   border: none;
@@ -673,12 +758,16 @@ button { font: inherit; }
   text-align: left;
 }
 .sidebar-link:hover {
-  background: #1e2f2a;
+  background: var(--color-accent-hover);
 }
 .sidebar-link.active {
-  background: #93e6ad;
-  color: #14241a;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
   font-weight: 700;
+}
+.sidebar-link:focus-visible {
+  outline: var(--focus-ring-accent);
+  outline-offset: 1px;
 }
 .sidebar-link .icon {
   width: 1.25rem;
@@ -689,7 +778,7 @@ button { font: inherit; }
   flex-direction: column;
   gap: 0.75rem;
   padding-top: 1rem;
-  border-top: 1px solid #40524e;
+  border-top: 1px solid var(--color-border);
 }
 .user-info {
   display: flex;
@@ -701,9 +790,9 @@ button { font: inherit; }
   place-items: center;
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 10px;
-  background: #93e6ad;
-  color: #13241b;
+  border-radius: var(--radius-lg);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
   font-weight: 800;
 }
 .user-details {
@@ -712,24 +801,24 @@ button { font: inherit; }
   min-width: 0;
 }
 .user-name {
-  color: #eef7f1;
+  color: var(--color-text);
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .user-email {
-  color: #8d9a9b;
+  color: var(--color-text-muted);
   font-size: 0.75rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .signout-button {
-  color: #f2acb6;
+  color: var(--color-error);
 }
 .signout-button:hover {
-  background: #4a2c32;
+  background: var(--color-error-bg);
 }
 .dashboard-main {
   display: flex;
@@ -738,23 +827,20 @@ button { font: inherit; }
 }
 .dashboard-header {
   padding: 1.25rem 2rem;
-  border-bottom: 1px solid #40524e;
-  background: #152522;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 .dashboard-header h1 {
   margin: 0;
   font-size: 1.25rem;
-  color: #eef7f1;
+  color: var(--color-text);
 }
 .dashboard-content {
   padding: 2rem;
-  max-width: 1000px;
-  width: 100%;
-  margin: 0 auto;
 }
 .dashboard-page h1 {
   margin: 0;
-  color: #eef7f1;
+  color: var(--color-text);
 }
 .dashboard-header-actions {
   display: flex;
@@ -772,17 +858,15 @@ button { font: inherit; }
   width: 1.25rem;
   height: 1.25rem;
 }
-
-
 .lessons-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 .lesson-card {
-  background: #152522;
-  border: 1px solid #40524e;
-  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 .lesson-card-main {
@@ -803,14 +887,14 @@ button { font: inherit; }
 .lesson-title {
   margin: 0;
   font-size: 1.125rem;
-  color: #eef7f1;
+  color: var(--color-text);
 }
 .lesson-topic {
   margin: 0;
-  color: #cddbd5;
+  color: var(--color-text-secondary);
 }
 .lesson-subject {
-  color: #93e6ad;
+  color: var(--color-accent);
   font-size: 0.875rem;
   font-weight: 600;
 }
@@ -830,23 +914,23 @@ button { font: inherit; }
   text-transform: uppercase;
 }
 .lesson-status.active {
-  background: #2d4837;
-  color: #b7e8c6;
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 .lesson-status.completed {
-  background: #3a514a;
-  color: #cddbd5;
+  background: var(--color-border-strong);
+  color: var(--color-text-secondary);
 }
 .lesson-status.archived {
-  background: #4a2c32;
-  color: #f2acb6;
+  background: var(--color-error-bg);
+  color: var(--color-error);
 }
 .lesson-step {
-  color: #8d9a9b;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 .lesson-date {
-  color: #8d9a9b;
+  color: var(--color-text-muted);
   font-size: 0.75rem;
 }
 .lesson-actions {
@@ -857,48 +941,81 @@ button { font: inherit; }
 }
 .action-button {
   padding: 0.5rem 0.875rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
   background: #202c2d;
   border: 1px solid #3a4d49;
-  color: #cddbd5;
+  color: var(--color-text-secondary);
   cursor: pointer;
   font-family: inherit;
 }
 .action-button.primary {
-  background: #93e6ad;
-  border-color: #93e6ad;
-  color: #14241a;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+.action-button.secondary {
+  background: var(--color-panel);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-secondary);
 }
 .action-button.danger {
-  border-color: #774952;
-  color: #f2acb6;
+  border-color: var(--color-error-border);
+  color: var(--color-error);
 }
 .action-button:hover {
   opacity: 0.9;
 }
+.action-button:focus-visible {
+  outline: var(--focus-ring-accent);
+  outline-offset: 1px;
+}
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.action-button:focus-visible {
+  outline: var(--focus-ring-accent);
+  outline-offset: 1px;
+}
+.rename-input {
+  flex: 1;
+  min-width: 120px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.45rem 0.6rem;
+  outline: none;
+}
+.rename-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--focus-ring);
+}
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  background: #152522;
-  border: 1px solid #40524e;
-  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 .empty-icon {
   width: 3rem;
   height: 3rem;
   margin: 0 auto 1rem;
-  color: #8d9a9b;
+  color: var(--color-text-muted);
 }
 .empty-state h2 {
   margin: 0 0 0.5rem 0;
-  color: #eef7f1;
+  color: var(--color-text);
 }
 .empty-state p {
   margin: 0 0 1.5rem 0;
-  color: #8d9a9b;
+  color: var(--color-text-muted);
 }
 .empty-state .auth-button {
   display: inline-flex;
@@ -912,37 +1029,55 @@ button { font: inherit; }
 }
 
 
-.new-lesson-page, .settings-page {
-  min-height: calc(100vh - 80px);
+.new-lesson-page {
+  min-height: calc(100vh - 120px);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 2rem;
 }
-.new-lesson-form, .settings-container {
+.new-lesson-container {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.new-lesson-form {
   width: 100%;
   max-width: 600px;
-  background: #152522;
-  border: 1px solid #40524e;
-  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
   padding: 2rem;
+  box-shadow: var(--shadow-panel);
+}
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.dashboard-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-panel);
 }
 .form-header h1 {
   margin: 0 0 0.5rem 0;
-  color: #eef7f1;
+  color: var(--color-text);
 }
 .form-header p {
   margin: 0 0 1.5rem 0;
-  color: #8d9a9b;
+  color: var(--color-text-muted);
 }
 .form-actions {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
 }
-.settings-container h1 {
-  margin: 0 0 1.5rem 0;
-  color: #eef7f1;
+.form-actions .auth-button.secondary {
+  font-weight: 600;
 }
 .new-lesson-container {
   min-height: calc(100vh - 80px);

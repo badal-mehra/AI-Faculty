@@ -61,10 +61,12 @@ export default function SettingsForm({ user, profile }: { user: any; profile: Pr
   };
 
   return (
-    <div className="settings-page">
-      <div className="settings-container">
+    <section className="dashboard-section">
+      <div className="dashboard-header-actions">
         <h1>Settings</h1>
+      </div>
 
+      <div className="dashboard-card">
         {error && <div className="auth-error" role="alert">{error}</div>}
         {success && <div className="auth-success" role="status">{success}</div>}
 
@@ -139,6 +141,6 @@ export default function SettingsForm({ user, profile }: { user: any; profile: Pr
           </div>
         </form>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { EyeIcon, EyeOffIcon } from "@/components/ui/icons";
 import { safeRedirectPath } from "@/lib/redirect";
 
 export default function ResetPasswordPage() {
@@ -78,7 +80,7 @@ export default function ResetPasswordPage() {
           </div>
           <div className="auth-error" role="alert">{error}</div>
           <p className="auth-footer">
-            <a href={`/forgot-password?redirectTo=${encodeURIComponent(redirectTo)}`}>Request a new reset link</a>
+            <Link href={`/forgot-password?redirectTo=${encodeURIComponent(redirectTo)}`}>Request a new reset link</Link>
           </p>
         </div>
       </div>
@@ -110,14 +112,15 @@ export default function ResetPasswordPage() {
                 autoComplete="new-password"
                 disabled={isLoading}
               />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "🙈" : "👁️"}
-              </button>
+               <button
+                 type="button"
+                 className="password-toggle"
+                 onClick={() => setShowPassword(!showPassword)}
+                 aria-label={showPassword ? "Hide password" : "Show password"}
+                 aria-pressed={showPassword}
+               >
+                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+               </button>
             </div>
           </div>
 
@@ -141,7 +144,7 @@ export default function ResetPasswordPage() {
         </form>
 
         <p className="auth-footer">
-          <a href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}>Back to Sign In</a>
+          <Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}>Back to Sign In</Link>
         </p>
       </div>
     </div>

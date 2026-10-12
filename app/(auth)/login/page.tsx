@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { EyeIcon, EyeOffIcon } from "@/components/ui/icons";
 import { safeRedirectPath } from "@/lib/redirect";
 
 export default function LoginPage() {
@@ -103,14 +105,15 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 disabled={isLoading}
               />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "🙈" : "👁️"}
-              </button>
+               <button
+                 type="button"
+                 className="password-toggle"
+                 onClick={() => setShowPassword(!showPassword)}
+                 aria-label={showPassword ? "Hide password" : "Show password"}
+                 aria-pressed={showPassword}
+               >
+                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+               </button>
             </div>
           </div>
 
@@ -120,11 +123,11 @@ export default function LoginPage() {
         </form>
 
         <div className="auth-links">
-          <a href={`/forgot-password?redirectTo=${encodeURIComponent(redirectTo)}`}>Forgot password?</a>
+          <Link href={`/forgot-password?redirectTo=${encodeURIComponent(redirectTo)}`}>Forgot password?</Link>
         </div>
 
         <p className="auth-footer">
-          Don't have an account? <a href={`/signup?redirectTo=${encodeURIComponent(redirectTo)}`}>Sign up</a>
+          Don't have an account? <Link href={`/signup?redirectTo=${encodeURIComponent(redirectTo)}`}>Sign up</Link>
         </p>
       </div>
     </div>

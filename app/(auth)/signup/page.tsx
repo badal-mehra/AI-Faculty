@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { EyeIcon, EyeOffIcon } from "@/components/ui/icons";
 import { safeRedirectPath } from "@/lib/redirect";
 
 export default function SignupPage() {
@@ -143,14 +145,15 @@ export default function SignupPage() {
                 autoComplete="new-password"
                 disabled={isLoading}
               />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "🙈" : "👁️"}
-              </button>
+               <button
+                 type="button"
+                 className="password-toggle"
+                 onClick={() => setShowPassword(!showPassword)}
+                 aria-label={showPassword ? "Hide password" : "Show password"}
+                 aria-pressed={showPassword}
+               >
+                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+               </button>
             </div>
           </div>
 
@@ -211,7 +214,7 @@ export default function SignupPage() {
         </form>
 
         <p className="auth-footer">
-          Already have an account? <a href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}>Log in</a>
+          Already have an account? <Link href={`/login?redirectTo=${encodeURIComponent(redirectTo)}`}>Log in</Link>
         </p>
       </div>
     </div>
