@@ -62,7 +62,7 @@ let page0 = null;
  * the same measurement a screenshot shows.
  */
 const AUDIT = () => {
-  const out = { painted: false, violations: [], counts: {}, focus: {}, animations: {}, connectors: [], steps: 0 };
+  const out = { painted: false, violations: [], counts: {}, focus: {}, animations: {}, connectors: [], steps: 0, debug: {} };
   const svg = document.querySelector(".diagram-canvas");
   if (!svg) {
     out.violations.push("no 2D diagram canvas on screen");
@@ -72,7 +72,8 @@ const AUDIT = () => {
   const box = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width
     ? svg.viewBox.baseVal
     : { x: 0, y: 0, width: board.width, height: board.height };
-  const scale = Math.min(board.width / box.width, board.height / box.height);
+   const scale = Math.min(board.width / box.width, board.height / box.height);
+   out.debug = { boardWidth: Math.round(board.width), boardHeight: Math.round(board.height), viewBox: svg.getAttribute("viewBox"), scale: Number(scale.toFixed(3)) };
   // preserveAspectRatio is xMidYMid meet, so the drawing can be letterboxed AND the viewBox origin is
   // not zero: user unit u maps to screen via (u - box.x).
   const originX = board.x + (board.width - box.width * scale) / 2;
@@ -389,6 +390,7 @@ for (const scenario of targets) {
         space: audit.space ?? null,
         violations: audit.violations,
         screenshot: shot,
+        debug: audit.debug,
       };
       entry.steps.push(step);
       if (!audit.painted) entry.problems.push(`step ${index + 1}: the board is blank`);

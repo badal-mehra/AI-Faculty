@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Classroom } from "@/components/Classroom";
+import type { BoardState } from "@/lib/board/types";
+import type { VisualScene } from "@/lib/visual/types";
+import type { Visual3DScene } from "@/lib/visual3d/types";
+import type { TeachingResponse } from "@/lib/teaching/types";
+import type { LessonProgressView } from "@/lib/teaching/objective";
 
 interface PersistHandlers {
   saveSession: (data: Record<string, unknown>) => void;
@@ -15,9 +20,13 @@ interface ClassroomCoreProps {
   session: {
     id: string;
     current_step_index: number;
+    board_state?: BoardState;
+    visual_state?: VisualScene;
+    visual3d_state?: Visual3DScene;
     [key: string]: unknown;
   };
   persistHandlers: PersistHandlers;
+  savedSteps: TeachingResponse[];
   isSaving: boolean;
   saveError: string | null;
   initialQuestion?: string;
@@ -26,6 +35,7 @@ interface ClassroomCoreProps {
 export function ClassroomCore({
   session,
   persistHandlers,
+  savedSteps,
   isSaving,
   saveError,
   initialQuestion,
@@ -41,6 +51,8 @@ export function ClassroomCore({
       </div>
     );
   }
+
+  const hasSavedSteps = savedSteps && savedSteps.length > 0;
 
   return (
     <div className="classroom-container">
@@ -60,6 +72,11 @@ export function ClassroomCore({
         initialStep={session.current_step_index}
         persistHandlers={persistHandlers}
         initialQuestion={initialQuestion}
+        initialBoardState={session.board_state as BoardState | undefined}
+        initialVisualState={session.visual_state as VisualScene | undefined}
+        initialVisual3dState={session.visual3d_state as Visual3DScene | undefined}
+        initialSteps={hasSavedSteps ? savedSteps : undefined}
+        initialProgress={session.lesson_objective ? (session.lesson_objective as LessonProgressView) : null}
       />
     </div>
   );

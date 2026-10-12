@@ -16,6 +16,7 @@
 // The fix is not "cancel more carefully". It is that an animation CARRIES ITS OWN IDENTITY, and anything
 // that mutates a scene checks the identity of the event first. An event from an older step cannot touch a
 // newer scene, no matter how it was scheduled, how late it is, or how many times it fired.
+
 import { teachesWith, type VisualMotion, type VisualScene } from "./types";
 
 /** The four things that together identify one animation of one object in one step of one lesson. */
@@ -31,10 +32,10 @@ export type AnimationContext = AnimationIdentity & {
   scene: VisualScene;
 };
 
-export const identityOf = (motion: VisualMotion | undefined, objectId: string): AnimationIdentity | null => {
+export function identityOf(motion: VisualMotion | undefined, objectId: string): AnimationIdentity | null {
   if (!motion || motion.lessonId === undefined || motion.stepId === undefined || motion.visualTick === undefined) return null;
   return { lessonId: motion.lessonId, stepId: motion.stepId, visualTick: motion.visualTick, objectId: motion.objectId ?? objectId };
-};
+}
 
 /**
  * Is this event still talking about the scene on screen?
@@ -89,7 +90,7 @@ export function isSettled(motion: VisualMotion | undefined): boolean {
  * than a state to settle: it is what the quality gate reports as `animationQualityScore` and what
  * `purgeStaleAnimations` removes.
  */
-export function staleAnimations(scene: VisualScene, current: { stepId: string; visualTick: number; lessonId?: string }): VisualObjectId[] {
+export function staleAnimations(scene: VisualScene, current: { stepId: string; visualTick: number; lessonId?: string }): string[] {
   return scene.objects
     .filter((object) => {
       const motion = object.motion;
@@ -100,8 +101,6 @@ export function staleAnimations(scene: VisualScene, current: { stepId: string; v
     })
     .map((object) => object.id);
 }
-
-type VisualObjectId = string;
 
 /**
  * Drop animations that belong to a step the student has left.

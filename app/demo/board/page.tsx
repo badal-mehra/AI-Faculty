@@ -17,12 +17,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { DiagramRenderer } from "../../../components/visual/DiagramRenderer";
-import {  settleVisualScene } from "../../../lib/visual/engine";
-import type { VisualQualityReport } from "../../../lib/visual/quality";
+import {  applyVisualActions, settleVisualScene } from "../../../lib/visual/engine";
+import { evaluateVisualQuality, type VisualQualityReport } from "../../../lib/visual/quality";
 import { repairVisualActions } from "../../../lib/visual/validate";
+import { composeScene } from "../../../lib/visual/composition";
 import { emptyVisualScene } from "../../../lib/visual/types";
-import type { VisualViewport } from "../../../lib/visual/types";
-import type { VisualAction, VisualActionDiagnostic, VisualScene } from "../../../lib/visual/types";
+import type { VisualViewport, VisualAction, VisualActionDiagnostic, VisualScene } from "../../../lib/visual/types";
 import { DEMO_SCENARIOS, type DemoScenario } from "../../../lib/visual/demoScenarios";
 
 export const dynamic = "force-dynamic";
@@ -96,21 +96,55 @@ export default function BoardDemoPage() {
   const apply = useCallback((index: number) => {
     const actions: VisualAction[] = script[index] ?? [];
     setScene((current) => {
-      const result = composeStepScene(current, actions, {
+      const played = applyVisualActions(current, actions, {
         step: index + 1,
         stage: 0,
         ...(boardViewport ? { viewport: boardViewport } : {}),
       });
-      setDiagnostics(result.report.problems.slice(0, 6).map((problem) => ({
-        action: "focus", target: "-", reason: problem, outcome: "skipped" as const, sceneObjects: result.scene.objects.length, index,
-      })));
-      setReport(result.report);
+      const result = composeScene(played, actions, {
+        step: index + 1,
+        stage: 0,
+        ...(boardViewport ? { viewport: boardViewport } : {}),
+      });
+       setDiagnostics([]);
+      if (boardViewport) {
+        setReport(evaluateVisualQuality({
+          scene: result.scene,
+          viewport: boardViewport,
+          step: index + 1,
+        }));
+      }
       return result.scene;
     });
     setStep(index + 1);
   }, [script, boardViewport]);
 
   const go = useCallback((index: number) => apply(index), [apply]);
+
+  // When a real viewport arrives after steps have been applied, the scene must be
+  // re-composed for the actual board — NOT the canonical 800×520 canvas the first
+  // step was compiled against. This mirrors the production classroom's viewport-change
+  // replay (Classroom.tsx handleViewport → viewportRebuild effect): the scene is the
+  // accumulated result of every step, and only the actions can reproduce it.
+  useEffect(() => {
+    if (!boardViewport || step === 0) return;
+    let composed: VisualScene = emptyVisualScene();
+    for (let index = 0; index < step; index += 1) {
+      const actions: VisualAction[] = script[index] ?? [];
+      const played = applyVisualActions(composed, actions, {
+        step: index + 1,
+        stage: 0,
+        viewport: boardViewport,
+      });
+      const result = composeScene(played, actions, {
+        step: index + 1,
+        stage: 0,
+        viewport: boardViewport,
+      });
+      composed = result.scene;
+    }
+    setScene(composed);
+  }, [boardViewport, step, script]);
 
   // Every state change is announced on `window.__board`, which is what the browser verification reads.
   useEffect(() => {

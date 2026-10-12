@@ -33,12 +33,14 @@
 // NOTHING HERE IMPORTS THE TEACHING LAYER. The subject policy arrives as data (`CompositionPolicy`), because
 // `lib/teaching` already imports this package and a runtime import in the other direction would make the
 // dependency cycle that both files exist to avoid.
-import { DIAGRAM_HEIGHT, DIAGRAM_WIDTH, MIN_BOARD_OBJECTS, VISUAL_PRIORITY } from "./types";
-import type { VisualAction, VisualLifecycle, VisualObject, VisualScene } from "./types";
+import { DIAGRAM_HEIGHT, DIAGRAM_WIDTH, MIN_BOARD_OBJECTS, VISUAL_PRIORITY, VISUAL_MARGIN } from "./types";
+import type { VisualAction, VisualLifecycle, VisualObject, VisualScene, VisualViewport } from "./types";
 import { groupOf, referencedIds, type Retirement } from "./lifecycle";
 import { assessScene, optimiseScene, attentionWeight } from "./semantics";
 import { resolveSceneOverlaps, settleVisualScene } from "./engine";
 import { VIEWPORT, boxOfObject, boxesOverlap } from "./geometry";
+import { setLayoutViewport } from "./geometry";
+import { syncLayoutViewport } from "./layout";
 
 /**
  * The subject's representation policy, as DATA.
@@ -76,8 +78,8 @@ export type CompositionInput = {
   stage?: number;
   /** True when this step answers an interruption rather than advancing the lesson. */
   temporary?: boolean;
-  /** The stage the composition is being planned for. */
-  viewport?: "narrow" | "wide";
+  /** The measured board viewport the composition is being planned for. */
+  viewport?: VisualViewport;
   /** The policy this composition is enforcing, when the caller has one. */
   policy?: CompositionPolicy;
   /** Overrides the computed budget. Used by tests to make the pressure explicit. */
@@ -154,16 +156,17 @@ export const MAX_REPAIR_PASSES = 2;
  * generous for a nearly empty board: the cost of a wrong budget is a diagram that got retired while there
  * was still room for it.
  */
-export function visualBudget(scene: VisualScene, viewport: "narrow" | "wide" = "wide"): number {
-  const width = VIEWPORT.width * (viewport === "narrow" ? 0.62 : 1);
-  const height = VIEWPORT.height * (viewport === "narrow" ? 0.7 : 1);
-  const usable = Math.max(1, (width - VIEWPORT.margin * 2) * (height - VIEWPORT.margin * 2));
+import { contentBox, viewportKind, type VisualViewport as VisualViewportType } from "./viewport";
+export function visualBudget(scene: VisualScene, viewport: VisualViewportType = { width: DIAGRAM_WIDTH, height: DIAGRAM_HEIGHT, margin: VISUAL_MARGIN }): number {
+  const kind = viewportKind(viewport);
+  const isNarrow = kind === "narrow" || kind === "compact";
+  const usable = contentBox(viewport);
+  const usableArea = Math.max(1, usable.width * usable.height);
   const objects = scene.objects;
-  if (objects.length === 0) return viewport === "narrow" ? 22 : 34;
+  if (objects.length === 0) return isNarrow ? 22 : 34;
   const meanArea = objects.reduce((total, object) => total + object.width * object.height, 0) / objects.length;
-  // Each object needs its own box plus breathing room, and the board should be at most ~65% covered.
-  const fits = Math.floor((usable * 0.65) / Math.max(1200, meanArea));
-  const ceiling = viewport === "narrow" ? 26 : 40;
+  const fits = Math.floor((usableArea * 0.65) / Math.max(1200, meanArea));
+  const ceiling = isNarrow ? 26 : 40;
   return Math.max(10, Math.min(ceiling, fits));
 }
 
@@ -476,12 +479,16 @@ export function composeScene(
   actions: readonly VisualAction[],
   input: CompositionInput = {},
 ): CompositionResult {
+  if (input.viewport) {
+    setLayoutViewport(input.viewport);
+    syncLayoutViewport();
+  }
   const referenced = referencedIds(actions);
   const keep = new Set<string>([...referenced, ...currentFocusIds(scene, actions, input.step)]);
-  const budget = input.budget ?? visualBudget(scene, input.viewport ?? "wide");
+  const budget = input.budget ?? visualBudget(scene, input.viewport ?? VIEWPORT);
 
   const selected = selectVisibleObjects(scene, budget, keep);
-  let working: VisualScene = { ...scene, objects: selected.kept };
+  let working: VisualScene = { ...scene, objects: selected.kept, viewport: input.viewport ?? scene.viewport };
 
   // Layout and collision resolution. `settleVisualScene` is the engine's own final pass, so composition
   // cannot leave a scene the renderer would have had to correct itself.

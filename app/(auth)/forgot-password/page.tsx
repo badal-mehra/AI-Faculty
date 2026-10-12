@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
+import { safeRedirectPath } from "@/lib/redirect";
 
 export default function ForgotPasswordPage() {
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/dashboard";
+  const redirectTo = safeRedirectPath(searchParams.get("redirectTo"));
 
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);

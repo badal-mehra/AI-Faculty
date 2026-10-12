@@ -16,7 +16,8 @@ import {
   CircuitElement, DIAGRAM_HEIGHT, DIAGRAM_WIDTH, ForceVector, FormulaRow, PlotPoint, StructureEdge,
   StructureMessage, StructureNode, VISUAL_MARGIN, VisualAction, VisualAnimation,
 } from "./types";
-import { VIEWPORT } from "./geometry";
+import { VIEWPORT, setLayoutViewport } from "./geometry";
+import type { VisualViewport } from "./viewport";
 import { heightForLabel, measureText, uniformWidthForLabels, widthForLabel } from "./measure";
 import { normaliseFormula } from "./formula";
 
@@ -25,23 +26,37 @@ import { normaliseFormula } from "./formula";
 // ---------------------------------------------------------------------------------------------
 
 /** Usable area once the classroom margins around the drawing are taken off. */
-const CONTENT = {
+let CONTENT = {
   left: VISUAL_MARGIN + 6,
   right: DIAGRAM_WIDTH - VISUAL_MARGIN - 6,
   top: VISUAL_MARGIN + 6,
   bottom: DIAGRAM_HEIGHT - VISUAL_MARGIN - 6,
 };
-const CONTENT_WIDTH = CONTENT.right - CONTENT.left;
-const CONTENT_HEIGHT = CONTENT.bottom - CONTENT.top;
-const CENTRE_X = (CONTENT.left + CONTENT.right) / 2;
-const CENTRE_Y = (CONTENT.top + CONTENT.bottom) / 2;
+let CONTENT_WIDTH = CONTENT.right - CONTENT.left;
+let CONTENT_HEIGHT = CONTENT.bottom - CONTENT.top;
+let CENTRE_X = (CONTENT.left + CONTENT.right) / 2;
+let CENTRE_Y = (CONTENT.top + CONTENT.bottom) / 2;
+
+export function syncLayoutViewport(): void {
+  const m = VIEWPORT.margin;
+  CONTENT = {
+    left: m + 6,
+    right: VIEWPORT.width - m - 6,
+    top: m + 6,
+    bottom: VIEWPORT.height - m - 6,
+  };
+  CONTENT_WIDTH = CONTENT.right - CONTENT.left;
+  CONTENT_HEIGHT = CONTENT.bottom - CONTENT.top;
+  CENTRE_X = (CONTENT.left + CONTENT.right) / 2;
+  CENTRE_Y = (CONTENT.top + CONTENT.bottom) / 2;
+}
 
 export type Placed = { id: string; x: number; y: number; width: number; height: number };
 
 /** Keeps a box completely on the board; a structure is never allowed to clip. */
 function fitBox(box: Placed): Placed {
-  const width = Math.min(box.width, VIEWPORT.width - 2 * VISUAL_MARGIN);
-  const height = Math.min(box.height, VIEWPORT.height - 2 * VISUAL_MARGIN);
+  const width = Math.min(box.width, VIEWPORT.width - 2 * VIEWPORT.margin);
+  const height = Math.min(box.height, VIEWPORT.height - 2 * VIEWPORT.margin);
   return {
     id: box.id,
     width,
@@ -119,9 +134,24 @@ export function compileArray(
   const actions: VisualAction[] = [];
   if (values.length === 0) return actions;
   const animate = withAnimate(options.animate);
-  const size = valueSize(values, { min: 68, max: 190 });
-  const gap = 5; // cells share their borders; a hair of space keeps each stroke readable
+  const gap = 5;
   const vertical = options.vertical === true;
+  const viewportScale = VIEWPORT.width / DIAGRAM_WIDTH;
+  const cellMin = Math.max(68, Math.round(68 * viewportScale));
+  const cellMax = Math.round(190 * viewportScale);
+  const baseSize = valueSize(values, { min: cellMin, max: cellMax });
+
+  let cellWidth = baseSize.width;
+  if (!vertical) {
+    const perLine = packLine(values.length, cellWidth, gap);
+    if (perLine >= values.length) {
+      const span = values.length * cellWidth + (values.length - 1) * gap;
+      if (span < CONTENT_WIDTH * 0.55) {
+        cellWidth = Math.min(cellMax, Math.max(cellMin, Math.round((CONTENT_WIDTH * 0.55 - (values.length - 1) * gap) / values.length)));
+      }
+    }
+  }
+  const size = { width: cellWidth, height: baseSize.height };
 
   const perLine = vertical
     ? Math.max(1, Math.min(values.length, Math.floor((CONTENT_HEIGHT - 96) / (size.height + 46))))

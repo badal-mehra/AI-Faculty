@@ -27,6 +27,8 @@
                   "tests/board-anchoring.test.ts",
                   "tests/teaching-taxonomy.test.ts",
                   "tests/teaching-policy.test.ts",
-                  "tests/visual-composition.test.ts"
-              ]
+"tests/visual-composition.test.ts",
+                  "tests/teaching-usage.test.ts",
+                  "tests/teaching-usage-endpoint.test.ts"
+                ]
 }

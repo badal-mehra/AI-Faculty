@@ -10,6 +10,18 @@ export const DIAGRAM_WIDTH = 800;
 export const DIAGRAM_HEIGHT = 520;
 export const VISUAL_MARGIN = 28;
 
+/**
+ * The measured board viewport used for layout.
+ *
+ * One board unit = one CSS pixel. The renderer measures the element and publishes this
+ * so the layout engine can compose FOR the actual board, not a canonical 800x520 canvas.
+ */
+export type VisualViewport = {
+  width: number;
+  height: number;
+  margin: number;
+};
+
 // ---- Bounded numeric limits (validation rejects anything outside these) ----
 export const MIN_OBJECT_SIZE = 8;
 export const MAX_OBJECT_SIZE = 720;
@@ -391,6 +403,12 @@ export type VisualMotion = {
   tick: number;
   /** Once set, the renderer draws the packet at this progress instead of animating it. */
   flowProgress?: number;
+  // Animation identity (PHASE 18): every animation carries its lesson/step/tick so stale
+  // events from an abandoned step cannot mutate a newer scene.
+  lessonId?: string;
+  stepId?: string;
+  visualTick?: number;
+  objectId?: string;
 };
 
 export type VisualObject = {
@@ -481,7 +499,17 @@ export type VisualScene = {
   theme?: VisualTheme;
   /** The object the teacher is talking about right now; everything else is subdued while set. */
   focusIds?: string[];
+  /** The viewport the scene was laid out for, so composition can match it 1:1. */
+  viewport?: VisualViewport;
 };
+
+/**
+ * Whether an animation kind represents a TEACHING change (move, replace, transform, etc.)
+ * rather than a mere appearance/fade. Used by the quality gate and animation guards.
+ */
+export function teachesWith(kind: string): boolean {
+  return kind === "move" || kind === "replace" || kind === "remove" || kind === "reorder" || kind === "transform" || kind === "travel" || kind === "draw" || kind === "flow";
+}
 
 export const emptyVisualScene = (): VisualScene => ({ objects: [], tick: 0 });
 

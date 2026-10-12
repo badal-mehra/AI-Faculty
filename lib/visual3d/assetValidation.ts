@@ -55,6 +55,7 @@ export function measureObjectBounds(root: THREE.Object3D | null, options: { visi
   if (!root) return { ...EMPTY_BOUNDS };
   const box = new THREE.Box3();
   let counted = 0;
+  let nonFinite = false;
   root.updateWorldMatrix(true, true);
   root.traverse((node) => {
     if (options.visibleOnly && !node.visible) return;
@@ -62,10 +63,15 @@ export function measureObjectBounds(root: THREE.Object3D | null, options: { visi
     if (!mesh.isMesh || !mesh.geometry) return;
     const geometry = mesh.geometry as THREE.BufferGeometry;
     if (!geometry.attributes || !geometry.attributes.position) return;
+    // A mesh with non-finite vertex positions has no measurable bounds, and asking Three.js to
+    // compute them emits a console warning ("Computed min/max have NaN values") before returning
+    // NaN. That warning is noise on top of a finding the validator already reports, so the geometry
+    // is skipped here rather than passed to Box3.expandByObject.
+    if (hasNonFiniteAttribute(geometry)) { nonFinite = true; return; }
     box.expandByObject(mesh);
     counted += 1;
   });
-  if (counted === 0 || box.isEmpty()) return { ...EMPTY_BOUNDS };
+  if (counted === 0 || box.isEmpty()) return { ...EMPTY_BOUNDS, finite: !nonFinite };
 
   const size = box.getSize(new THREE.Vector3());
   const center = box.getCenter(new THREE.Vector3());

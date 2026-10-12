@@ -38,6 +38,10 @@ export type StepVisualContext = {
   stage?: number;
   /** Set when these actions answer an interruption rather than advancing the lesson. */
   temporary?: boolean;
+  /** The viewport the scene is being laid out for. */
+  viewport?: import("./viewport").VisualViewport;
+  /** The teaching intent of this step. */
+  teachingIntent?: string;
 };
 
 /** Why an object left the board, so the report can say it rather than a student noticing it. */

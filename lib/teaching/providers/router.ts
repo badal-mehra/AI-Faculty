@@ -35,6 +35,8 @@ import { logProviderOutcome, logProviderRequest } from "../diagnostics";
 export type TeachingStepResult = {
   response: TeachingResponse;
   provider: TeachingProviderName;
+  /** The exact model id the chosen provider answered with, for usage attribution. */
+  model: string;
   geminiAttempts: number;
   fallback: boolean;
   latencyMs: number;
@@ -279,7 +281,7 @@ async function run<T extends TeachingResponse | TeachingLessonResponse>(
   lesson: TeachingRequest,
   path: "lesson" | "step",
   simulation: TeachingSimulation,
-): Promise<{ response: T; provider: TeachingProviderName; geminiAttempts: number; latencyMs: number; plan: RequestPlan; actualTokens: number | null }> {
+): Promise<{ response: T; provider: TeachingProviderName; model: string; geminiAttempts: number; latencyMs: number; plan: RequestPlan; actualTokens: number | null }> {
   const startedAt = Date.now();
   const plan = planRequest(lesson, path, (families) => schemaFor(path, families));
   const schemaJson = schemaFor(path, plan.families);
@@ -312,7 +314,7 @@ const geminiConfigured = Boolean(process.env.GEMINI_API_KEY) || Boolean(simulati
   if (gemini) {
     const response = (path === "lesson" ? (gemini.response as TeachingLessonResponse) : (gemini.response as TeachingResponse));
     usageAttempts.push(gemini.response.usage);
-    return { response: response as T, provider: "gemini", geminiAttempts: gemini.attempts, latencyMs: Date.now() - startedAt, plan, actualTokens: actualTokensFor(usageAttempts) };
+    return { response: response as T, provider: "gemini", model: gemini.model, geminiAttempts: gemini.attempts, latencyMs: Date.now() - startedAt, plan, actualTokens: actualTokensFor(usageAttempts) };
   }
 
   // A lesson is made of many batches, so a student waiting several minutes for ONE of them is worse
@@ -325,7 +327,7 @@ const geminiConfigured = Boolean(process.env.GEMINI_API_KEY) || Boolean(simulati
   if (groq) {
     const response = (path === "lesson" ? (groq.response as TeachingLessonResponse) : (groq.response as TeachingResponse));
     usageAttempts.push(groq.response.usage);
-    return { response: response as T, provider: "groq", geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: groq.plan, actualTokens: actualTokensFor(usageAttempts) };
+    return { response: response as T, provider: "groq", model: GROQ_TEACHING_MODEL_NAME, geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: groq.plan, actualTokens: actualTokensFor(usageAttempts) };
   }
 
   if (outOfTime(startedAt)) {
@@ -337,7 +339,7 @@ const geminiConfigured = Boolean(process.env.GEMINI_API_KEY) || Boolean(simulati
   if (mistral) {
     const response = (path === "lesson" ? (mistral.response as TeachingLessonResponse) : (mistral.response as TeachingResponse));
     usageAttempts.push(mistral.response.usage);
-    return { response: response as T, provider: "mistral", geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: mistral.plan, actualTokens: actualTokensFor(usageAttempts) };
+    return { response: response as T, provider: "mistral", model: MISTRAL_TEACHING_MODEL_NAME, geminiAttempts: 0, latencyMs: Date.now() - startedAt, plan: mistral.plan, actualTokens: actualTokensFor(usageAttempts) };
   }
 
   if (!geminiConfigured && !process.env.GROQ_API_KEY && !process.env.MISTRAL_API_KEY) {
@@ -358,8 +360,9 @@ export async function generateTeachingStep(lesson: TeachingRequest, simulation: 
   logQuality(judged.report, lesson);
   logComposition(judged.report, lesson);
   return {
-    response: { ...(judged.steps[0] ?? result.response), representation: result.plan.representation, ...usageField(result.actualTokens) },
+    response: { ...(judged.steps[0] ?? result.response), representation: result.plan.representation, ...usageField(result.actualTokens), provider: result.provider, model: result.model },
     provider: result.provider,
+    model: result.model,
     geminiAttempts: result.geminiAttempts,
     fallback: result.provider !== "gemini",
     latencyMs: result.latencyMs,
@@ -430,6 +433,9 @@ export async function generateTeachingLesson(lesson: TeachingRequest, options: {
     steps: judged.steps.map((step) => ({ ...step, representation: result.plan.representation })),
     progress: lessonProgressView(progress, result.plan.objective),
     ...(options.diagnostics ? { quality: summariseLessonQuality(judged.report) } : {}),
+    ...usageField(result.actualTokens),
+    provider: result.provider,
+    model: result.model,
   };
 }
 
