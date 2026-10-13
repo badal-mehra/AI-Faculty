@@ -1811,9 +1811,9 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 50,
-    "meshCount": 50,
-    "materialCount": 2,
+    "partCount": 59,
+    "meshCount": 59,
+    "materialCount": 4,
     "bounds": {
       "min": [
         -0.44502,
@@ -1832,8 +1832,8 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       ],
       "radius": 1
     },
-    "triangles": 25532,
-    "bytes": 568180,
+    "triangles": 36476,
+    "bytes": 789596,
     "semanticAnchors": [
       "skull",
       "jaw",
@@ -1867,6 +1867,15 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "rib_r_8",
       "sternum",
       "pelvis",
+      "tooth_1",
+      "tooth_2",
+      "tooth_3",
+      "tooth_4",
+      "tooth_5",
+      "tooth_6",
+      "tooth_7",
+      "tooth_8",
+      "tongue",
       "left_shoulder",
       "left_humerus",
       "left_elbow",
@@ -2142,6 +2151,78 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
           0
         ],
         "radius": 0.22307
+      },
+      "tooth_1": {
+        "center": [
+          -0.08785,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tooth_2": {
+        "center": [
+          -0.06369,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tooth_3": {
+        "center": [
+          -0.03953,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tooth_4": {
+        "center": [
+          -0.01537,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tooth_5": {
+        "center": [
+          0.00878,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tooth_6": {
+        "center": [
+          0.03295,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tooth_7": {
+        "center": [
+          0.05711,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tooth_8": {
+        "center": [
+          0.08126,
+          0.59519,
+          0.09664
+        ],
+        "radius": 0.03804
+      },
+      "tongue": {
+        "center": [
+          0,
+          0.51612,
+          0.04393
+        ],
+        "radius": 0.13695
       },
       "left_shoulder": {
         "center": [
@@ -3897,36 +3978,37 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 6,
-    "meshCount": 6,
-    "materialCount": 3,
+    "partCount": 7,
+    "meshCount": 7,
+    "materialCount": 4,
     "bounds": {
       "min": [
-        -0.57735,
-        -0.57735,
-        -0.57735
+        -0.61425,
+        -0.49537,
+        -0.61425
       ],
       "max": [
-        0.57735,
-        0.57735,
-        0.57735
+        0.61425,
+        0.49537,
+        0.61425
       ],
       "size": [
-        1.1547,
-        1.1547,
-        1.1547
+        1.2285,
+        0.99074,
+        1.2285
       ],
       "radius": 1
     },
-    "triangles": 3024,
-    "bytes": 68288,
+    "triangles": 3376,
+    "bytes": 76628,
     "semanticAnchors": [
       "chloroplast",
       "granum_1a",
       "granum_1b",
       "granum_2a",
       "granum_2b",
-      "thylakoid"
+      "thylakoid",
+      "stroma"
     ],
     "anchors": {
       "chloroplast": {
@@ -3935,15 +4017,15 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
           0,
           0
         ],
-        "radius": 1
+        "radius": 0.85801
       },
       "granum_1a": {
         "center": [
           0,
-          0.13857,
+          0.11889,
           0
         ],
-        "radius": 0.49207
+        "radius": 0.4222
       },
       "granum_1b": {
         "center": [
@@ -3951,31 +4033,39 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
           0,
           0
         ],
-        "radius": 0.49207
+        "radius": 0.4222
       },
       "granum_2a": {
         "center": [
-          0.05774,
-          -0.16166,
-          0.04619
+          0.04954,
+          -0.1387,
+          0.03963
         ],
-        "radius": 0.45794
+        "radius": 0.39292
       },
       "granum_2b": {
         "center": [
-          0.05773,
-          -0.30022,
-          0.04618
+          0.04954,
+          -0.25759,
+          0.03963
         ],
-        "radius": 0.39283
+        "radius": 0.33704
       },
       "thylakoid": {
         "center": [
           0,
-          -0.05773,
+          -0.04954,
           0
         ],
-        "radius": 0.75258
+        "radius": 0.64572
+      },
+      "stroma": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.86958
       }
     }
   },
@@ -3992,9 +4082,9 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 5,
-    "meshCount": 5,
-    "materialCount": 5,
+    "partCount": 6,
+    "meshCount": 6,
+    "materialCount": 6,
     "bounds": {
       "min": [
         -0.65227,
@@ -4013,14 +4103,15 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       ],
       "radius": 1
     },
-    "triangles": 6716,
-    "bytes": 135860,
+    "triangles": 7248,
+    "bytes": 147468,
     "semanticAnchors": [
       "protein_backbone",
       "active_site_lobe",
       "substrate_binding",
       "substrate",
-      "active_site"
+      "active_site",
+      "cofactor"
     ],
     "anchors": {
       "protein_backbone": {
@@ -4062,6 +4153,14 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
           -0.0007
         ],
         "radius": 0.20249
+      },
+      "cofactor": {
+        "center": [
+          -0.06959,
+          -0.41915,
+          -0.04245
+        ],
+        "radius": 0.11475
       }
     }
   },
@@ -4098,8 +4197,8 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       ],
       "radius": 1
     },
-    "triangles": 1846,
-    "bytes": 50080,
+    "triangles": 2742,
+    "bytes": 66064,
     "semanticAnchors": [
       "support_frame",
       "support_crossbar",
@@ -4132,10 +4231,10 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "pulley_wheel": {
         "center": [
           0,
-          0.47172,
+          0.47173,
           0
         ],
-        "radius": 0.47143
+        "radius": 0.47147
       },
       "pulley_axle": {
         "center": [
@@ -4434,67 +4533,103 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 4,
-    "meshCount": 4,
-    "materialCount": 3,
+    "partCount": 8,
+    "meshCount": 8,
+    "materialCount": 5,
     "bounds": {
       "min": [
-        -0.41685,
-        -0.86754,
-        -0.2713
+        -0.42979,
+        -0.81522,
+        -0.3882
       ],
       "max": [
-        0.41685,
-        0.86754,
-        0.2713
+        0.42979,
+        0.81522,
+        0.3882
       ],
       "size": [
-        0.8337,
-        1.73508,
-        0.5426
+        0.85958,
+        1.63044,
+        0.7764
       ],
       "radius": 1
     },
-    "triangles": 3314,
-    "bytes": 69624,
+    "triangles": 3698,
+    "bytes": 84644,
     "semanticAnchors": [
       "spring_coil",
       "spring_top_plate",
       "spring_bottom_plate",
-      "spring_force"
+      "spring_force",
+      "mounting_bracket_1",
+      "mounting_bracket_2",
+      "coil_seat_top",
+      "coil_seat_bottom"
     ],
     "anchors": {
       "spring_coil": {
         "center": [
-          -0.1457,
-          -0.00024,
-          0
+          -0.04128,
+          -0.0002,
+          0.00005
         ],
-        "radius": 0.91757
+        "radius": 0.76837
       },
       "spring_top_plate": {
         "center": [
-          -0.14606,
-          0.82781,
-          -0.00006
+          -0.04159,
+          0.69321,
+          0
         ],
-        "radius": 0.3302
+        "radius": 0.55001
       },
       "spring_bottom_plate": {
         "center": [
-          -0.14606,
-          -0.8278,
-          -0.00006
+          -0.04159,
+          -0.69321,
+          0
         ],
-        "radius": 0.3302
+        "radius": 0.55001
       },
       "spring_force": {
         "center": [
-          0.21983,
-          -0.19867,
-          -0.00007
+          0.26481,
+          -0.16637,
+          0
         ],
-        "radius": 0.21765
+        "radius": 0.18226
+      },
+      "mounting_bracket_1": {
+        "center": [
+          -0.04159,
+          0.74867,
+          0.08319
+        ],
+        "radius": 0.25005
+      },
+      "mounting_bracket_2": {
+        "center": [
+          -0.04159,
+          -0.74867,
+          0.08319
+        ],
+        "radius": 0.25005
+      },
+      "coil_seat_top": {
+        "center": [
+          -0.04159,
+          0.67657,
+          0
+        ],
+        "radius": 0.05763
+      },
+      "coil_seat_bottom": {
+        "center": [
+          -0.04159,
+          -0.67657,
+          0
+        ],
+        "radius": 0.05763
       }
     }
   },
@@ -4802,85 +4937,103 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 6,
-    "meshCount": 6,
-    "materialCount": 5,
+    "partCount": 8,
+    "meshCount": 8,
+    "materialCount": 7,
     "bounds": {
       "min": [
-        -0.64913,
-        -0.71947,
-        -0.24695
+        -0.53481,
+        -0.66352,
+        -0.52318
       ],
       "max": [
-        0.64913,
-        0.71947,
-        0.24695
+        0.53481,
+        0.66352,
+        0.52318
       ],
       "size": [
-        1.29826,
-        1.43894,
-        0.4939
+        1.06962,
+        1.32704,
+        1.04636
       ],
       "radius": 1
     },
-    "triangles": 1532,
-    "bytes": 39656,
+    "triangles": 2412,
+    "bytes": 62720,
     "semanticAnchors": [
       "launcher_barrel",
       "launcher_base",
       "launcher_support",
       "projectile",
       "launch_velocity",
-      "gravity_force"
+      "gravity_force",
+      "launch_angle_marker",
+      "calibration_ring"
     ],
     "anchors": {
       "launcher_barrel": {
         "center": [
-          0.01138,
-          0.38957,
+          0.00938,
+          0.2502,
           0
         ],
-        "radius": 0.73176
+        "radius": 0.60289
       },
       "launcher_base": {
         "center": [
-          0.00415,
-          -0.28201,
+          0.00342,
+          -0.3031,
           0
         ],
-        "radius": 0.40618
+        "radius": 0.74135
       },
       "launcher_support": {
         "center": [
-          0.28638,
-          0.07078,
+          0.23594,
+          -0.01245,
           0
         ],
-        "radius": 0.38954
+        "radius": 0.35797
       },
       "projectile": {
         "center": [
-          -0.52504,
-          -0.11267,
+          -0.43257,
+          -0.16359,
           0
         ],
-        "radius": 0.19553
+        "radius": 0.1611
       },
       "launch_velocity": {
         "center": [
-          -0.41948,
-          0.27458,
+          -0.3456,
+          0.15546,
           0
         ],
-        "radius": 0.25909
+        "radius": 0.21346
       },
       "gravity_force": {
         "center": [
-          -0.52504,
-          -0.53955,
+          -0.43257,
+          -0.51528,
           0
         ],
-        "radius": 0.20514
+        "radius": 0.16901
+      },
+      "launch_angle_marker": {
+        "center": [
+          -0.02565,
+          0.29565,
+          0.02907
+        ],
+        "radius": 0.1869
+      },
+      "calibration_ring": {
+        "center": [
+          0.17781,
+          0.55724,
+          0.0872
+        ],
+        "radius": 0.15989
       }
     }
   },
@@ -5281,85 +5434,103 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 6,
-    "meshCount": 6,
-    "materialCount": 6,
+    "partCount": 8,
+    "meshCount": 8,
+    "materialCount": 7,
     "bounds": {
       "min": [
-        -0.86616,
-        -0.45806,
-        -0.19988
+        -0.76611,
+        -0.39015,
+        -0.51074
       ],
       "max": [
-        0.86616,
-        0.45806,
-        0.19988
+        0.76611,
+        0.39015,
+        0.51074
       ],
       "size": [
-        1.73232,
-        0.91612,
-        0.39976
+        1.53222,
+        0.7803,
+        1.02148
       ],
       "radius": 1
     },
-    "triangles": 1354,
-    "bytes": 34536,
+    "triangles": 2502,
+    "bytes": 61428,
     "semanticAnchors": [
       "lever_bar",
       "lever_pivot",
       "fulcrum",
       "load_block",
       "effort_point",
-      "load_torque"
+      "load_torque",
+      "effort_arm_marker",
+      "load_arm_marker"
     ],
     "anchors": {
       "lever_bar": {
         "center": [
-          0,
-          -0.10493,
+          -0.02837,
+          -0.08938,
           0
         ],
-        "radius": 0.86844
+        "radius": 0.73967
       },
       "lever_pivot": {
         "center": [
-          0,
-          -0.26484,
+          -0.02837,
+          -0.22557,
           0
         ],
-        "radius": 0.1731
+        "radius": 0.25537
       },
       "fulcrum": {
         "center": [
-          0,
-          -0.41142,
+          -0.02838,
+          -0.35042,
           0
         ],
-        "radius": 0.36334
+        "radius": 0.72339
       },
       "load_block": {
         "center": [
-          0.66628,
-          0.08162,
+          0.53912,
+          0.06952,
           0
         ],
-        "radius": 0.2308
+        "radius": 0.3405
       },
       "effort_point": {
         "center": [
-          -0.66627,
-          0.00166,
+          -0.59586,
+          0.00142,
           0
         ],
-        "radius": 0.13848
+        "radius": 0.11795
       },
       "load_torque": {
         "center": [
-          0.66628,
-          0.25985,
+          0.53912,
+          0.22132,
           0
         ],
-        "radius": 0.21897
+        "radius": 0.18651
+      },
+      "effort_arm_marker": {
+        "center": [
+          -0.34049,
+          0.04682,
+          0
+        ],
+        "radius": 0.2565
+      },
+      "load_arm_marker": {
+        "center": [
+          0.2724,
+          0.04682,
+          0
+        ],
+        "radius": 0.29891
       }
     }
   },
@@ -5376,29 +5547,29 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 8,
-    "meshCount": 8,
-    "materialCount": 8,
+    "partCount": 16,
+    "meshCount": 16,
+    "materialCount": 13,
     "bounds": {
       "min": [
-        -0.30151,
-        -0.90453,
-        -0.30151
+        -0.3413,
+        -0.86351,
+        -0.37131
       ],
       "max": [
-        0.30151,
-        0.90453,
-        0.30151
+        0.3413,
+        0.86351,
+        0.37131
       ],
       "size": [
-        0.60302,
-        1.80906,
-        0.60302
+        0.6826,
+        1.72702,
+        0.74262
       ],
       "radius": 1
     },
-    "triangles": 796,
-    "bytes": 31924,
+    "triangles": 2156,
+    "bytes": 80020,
     "semanticAnchors": [
       "cylinder_block",
       "piston",
@@ -5407,72 +5578,144 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "crankshaft",
       "combustion_chamber",
       "intake_valve",
-      "exhaust_valve"
+      "exhaust_valve",
+      "flywheel",
+      "spark_plug",
+      "valve_spring_1",
+      "valve_spring_2",
+      "engine_mount_1",
+      "engine_mount_2",
+      "exhaust_port",
+      "intake_manifold"
     ],
     "anchors": {
       "cylinder_block": {
         "center": [
-          0,
-          -0.48241,
-          0
+          0.02355,
+          -0.46054,
+          -0.08347
         ],
-        "radius": 0.6
+        "radius": 0.57279
       },
       "piston": {
         "center": [
-          0,
-          -0.1809,
-          0
+          0.02356,
+          -0.1727,
+          -0.08347
         ],
-        "radius": 0.37794
+        "radius": 0.3608
       },
       "piston_rod": {
         "center": [
-          0,
-          0.30151,
-          0
+          0.02355,
+          0.28784,
+          -0.08347
         ],
-        "radius": 0.36986
+        "radius": 0.35309
       },
       "crank_weight": {
         "center": [
-          0,
-          0.75378,
-          0
+          0.02355,
+          0.71959,
+          -0.08347
         ],
-        "radius": 0.19771
+        "radius": 0.18875
       },
       "crankshaft": {
         "center": [
-          0,
-          0.78393,
-          0
+          0.02356,
+          0.74838,
+          -0.08347
         ],
-        "radius": 0.31334
+        "radius": 0.29913
       },
       "combustion_chamber": {
         "center": [
-          0,
-          0.03015,
-          0
+          0.02355,
+          0.02878,
+          -0.08347
         ],
-        "radius": 0.27136
+        "radius": 0.25905
       },
       "intake_valve": {
         "center": [
-          -0.21106,
-          -0.1206,
-          0
+          -0.17793,
+          -0.11513,
+          -0.08347
         ],
-        "radius": 0.13457
+        "radius": 0.12847
       },
       "exhaust_valve": {
         "center": [
-          0.21106,
-          -0.1206,
-          0
+          0.22504,
+          -0.11513,
+          -0.08347
         ],
-        "radius": 0.13457
+        "radius": 0.12847
+      },
+      "flywheel": {
+        "center": [
+          0.02356,
+          -0.46053,
+          0.17558
+        ],
+        "radius": 0.28061
+      },
+      "spark_plug": {
+        "center": [
+          0.12717,
+          0.08635,
+          -0.08347
+        ],
+        "radius": 0.11133
+      },
+      "valve_spring_1": {
+        "center": [
+          -0.17793,
+          -0.05757,
+          -0.08347
+        ],
+        "radius": 0.10599
+      },
+      "valve_spring_2": {
+        "center": [
+          0.22504,
+          -0.05757,
+          -0.08347
+        ],
+        "radius": 0.10599
+      },
+      "engine_mount_1": {
+        "center": [
+          -0.20671,
+          -0.57567,
+          0.26193
+        ],
+        "radius": 0.15797
+      },
+      "engine_mount_2": {
+        "center": [
+          0.25382,
+          -0.57567,
+          0.26193
+        ],
+        "radius": 0.15797
+      },
+      "exhaust_port": {
+        "center": [
+          0.22504,
+          -0.3454,
+          0.17558
+        ],
+        "radius": 0.20626
+      },
+      "intake_manifold": {
+        "center": [
+          -0.23549,
+          -0.11513,
+          0.20437
+        ],
+        "radius": 0.2514
       }
     }
   },
@@ -5954,29 +6197,29 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 9,
-    "meshCount": 9,
-    "materialCount": 3,
+    "partCount": 10,
+    "meshCount": 10,
+    "materialCount": 4,
     "bounds": {
       "min": [
-        -0.57735,
-        -0.57735,
-        -0.57735
+        -0.67114,
+        -0.31489,
+        -0.67114
       ],
       "max": [
-        0.57735,
-        0.57735,
-        0.57735
+        0.67114,
+        0.31489,
+        0.67114
       ],
       "size": [
-        1.1547,
-        1.1547,
-        1.1547
+        1.34228,
+        0.62978,
+        1.34228
       ],
-      "radius": 1
+      "radius": 1.00001
     },
-    "triangles": 6528,
-    "bytes": 140040,
+    "triangles": 6880,
+    "bytes": 148396,
     "semanticAnchors": [
       "carbon_atom",
       "hydrogen_1",
@@ -5986,7 +6229,8 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "hydrogen_3",
       "bond_3",
       "hydrogen_4",
-      "bond_4"
+      "bond_4",
+      "electron_cloud"
     ],
     "anchors": {
       "carbon_atom": {
@@ -5995,71 +6239,79 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
           0,
           0
         ],
-        "radius": 0.45085
+        "radius": 0.2459
       },
       "hydrogen_1": {
         "center": [
-          0.42354,
-          0.42354,
-          0.42354
+          0.231,
+          0.231,
+          0.231
         ],
-        "radius": 0.26642
+        "radius": 0.1453
       },
       "bond_1": {
         "center": [
-          0.21177,
-          0.21177,
-          0.21177
+          0.1155,
+          0.1155,
+          0.1155
         ],
-        "radius": 0.42575
+        "radius": 0.2322
       },
       "hydrogen_2": {
         "center": [
-          -0.42353,
-          -0.42353,
-          0.42354
+          -0.231,
+          -0.231,
+          0.231
         ],
-        "radius": 0.26642
+        "radius": 0.1453
       },
       "bond_2": {
         "center": [
-          -0.21176,
-          -0.21176,
-          0.21177
+          -0.1155,
+          -0.1155,
+          0.1155
         ],
-        "radius": 0.42575
+        "radius": 0.2322
       },
       "hydrogen_3": {
         "center": [
-          -0.42353,
-          0.42354,
-          -0.42353
+          -0.231,
+          0.231,
+          -0.231
         ],
-        "radius": 0.26642
+        "radius": 0.1453
       },
       "bond_3": {
         "center": [
-          -0.21176,
-          0.21177,
-          -0.21177
+          -0.1155,
+          0.1155,
+          -0.1155
         ],
-        "radius": 0.42575
+        "radius": 0.2322
       },
       "hydrogen_4": {
         "center": [
-          0.42354,
-          -0.42353,
-          -0.42353
+          0.231,
+          -0.231,
+          -0.231
         ],
-        "radius": 0.26642
+        "radius": 0.1453
       },
       "bond_4": {
         "center": [
-          0.21177,
-          -0.21176,
-          -0.21177
+          0.1155,
+          -0.1155,
+          -0.1155
         ],
-        "radius": 0.42575
+        "radius": 0.2322
+      },
+      "electron_cloud": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.94992
       }
     }
   },
@@ -6217,9 +6469,9 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 40,
-    "meshCount": 40,
-    "materialCount": 3,
+    "partCount": 94,
+    "meshCount": 94,
+    "materialCount": 5,
     "bounds": {
       "min": [
         -0.57735,
@@ -6238,36 +6490,36 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       ],
       "radius": 1
     },
-    "triangles": 37360,
-    "bytes": 764128,
+    "triangles": 51264,
+    "bytes": 1086468,
     "semanticAnchors": [
-      "ion_1",
-      "ion_2",
-      "ion_3",
-      "ion_4",
-      "ion_5",
-      "ion_6",
-      "ion_7",
-      "ion_8",
-      "ion_9",
-      "ion_10",
-      "ion_11",
-      "ion_12",
-      "ion_13",
-      "ion_14",
-      "ion_15",
-      "ion_16",
-      "ion_17",
-      "ion_18",
-      "ion_19",
-      "ion_20",
-      "ion_21",
-      "ion_22",
-      "ion_23",
-      "ion_24",
-      "ion_25",
-      "ion_26",
-      "ion_27",
+      "anion_1",
+      "cation_2",
+      "anion_3",
+      "cation_4",
+      "anion_5",
+      "cation_6",
+      "anion_7",
+      "cation_8",
+      "anion_9",
+      "cation_10",
+      "anion_11",
+      "cation_12",
+      "anion_13",
+      "cation_14",
+      "anion_15",
+      "cation_16",
+      "anion_17",
+      "cation_18",
+      "anion_19",
+      "cation_20",
+      "anion_21",
+      "cation_22",
+      "anion_23",
+      "cation_24",
+      "anion_25",
+      "cation_26",
+      "anion_27",
       "unit_cell_edge_1",
       "unit_cell_edge_2",
       "unit_cell_edge_3",
@@ -6280,10 +6532,64 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "unit_cell_edge_10",
       "unit_cell_edge_11",
       "unit_cell_edge_12",
-      "cation"
+      "ionic_bond_1",
+      "ionic_bond_2",
+      "ionic_bond_3",
+      "ionic_bond_4",
+      "ionic_bond_5",
+      "ionic_bond_6",
+      "ionic_bond_7",
+      "ionic_bond_8",
+      "ionic_bond_9",
+      "ionic_bond_10",
+      "ionic_bond_11",
+      "ionic_bond_12",
+      "ionic_bond_13",
+      "ionic_bond_14",
+      "ionic_bond_15",
+      "ionic_bond_16",
+      "ionic_bond_17",
+      "ionic_bond_18",
+      "ionic_bond_19",
+      "ionic_bond_20",
+      "ionic_bond_21",
+      "ionic_bond_22",
+      "ionic_bond_23",
+      "ionic_bond_24",
+      "ionic_bond_25",
+      "ionic_bond_26",
+      "ionic_bond_27",
+      "ionic_bond_28",
+      "ionic_bond_29",
+      "ionic_bond_30",
+      "ionic_bond_31",
+      "ionic_bond_32",
+      "ionic_bond_33",
+      "ionic_bond_34",
+      "ionic_bond_35",
+      "ionic_bond_36",
+      "ionic_bond_37",
+      "ionic_bond_38",
+      "ionic_bond_39",
+      "ionic_bond_40",
+      "ionic_bond_41",
+      "ionic_bond_42",
+      "ionic_bond_43",
+      "ionic_bond_44",
+      "ionic_bond_45",
+      "ionic_bond_46",
+      "ionic_bond_47",
+      "ionic_bond_48",
+      "ionic_bond_49",
+      "ionic_bond_50",
+      "ionic_bond_51",
+      "ionic_bond_52",
+      "ionic_bond_53",
+      "ionic_bond_54",
+      "lattice_origin"
     ],
     "anchors": {
-      "ion_1": {
+      "anion_1": {
         "center": [
           -0.41623,
           -0.41623,
@@ -6291,7 +6597,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_2": {
+      "cation_2": {
         "center": [
           -0.41623,
           -0.41623,
@@ -6299,7 +6605,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_3": {
+      "anion_3": {
         "center": [
           -0.41623,
           -0.41623,
@@ -6307,7 +6613,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_4": {
+      "cation_4": {
         "center": [
           -0.41623,
           0,
@@ -6315,7 +6621,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_5": {
+      "anion_5": {
         "center": [
           -0.41623,
           0,
@@ -6323,7 +6629,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_6": {
+      "cation_6": {
         "center": [
           -0.41623,
           0,
@@ -6331,7 +6637,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_7": {
+      "anion_7": {
         "center": [
           -0.41623,
           0.41623,
@@ -6339,7 +6645,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_8": {
+      "cation_8": {
         "center": [
           -0.41623,
           0.41623,
@@ -6347,7 +6653,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_9": {
+      "anion_9": {
         "center": [
           -0.41623,
           0.41623,
@@ -6355,7 +6661,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_10": {
+      "cation_10": {
         "center": [
           0,
           -0.41623,
@@ -6363,7 +6669,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_11": {
+      "anion_11": {
         "center": [
           0,
           -0.41623,
@@ -6371,87 +6677,87 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_12": {
+      "cation_12": {
         "center": [
           0,
-          -0.41623,
-          0.41623
-        ],
-        "radius": 0.27907
-      },
-      "ion_13": {
-        "center": [
-          0,
-          0,
-          -0.41623
-        ],
-        "radius": 0.27907
-      },
-      "ion_14": {
-        "center": [
-          0,
-          0,
-          0
-        ],
-        "radius": 0.27907
-      },
-      "ion_15": {
-        "center": [
-          0,
-          0,
-          0.41623
-        ],
-        "radius": 0.27907
-      },
-      "ion_16": {
-        "center": [
-          0,
-          0.41623,
-          -0.41623
-        ],
-        "radius": 0.27907
-      },
-      "ion_17": {
-        "center": [
-          0,
-          0.41623,
-          0
-        ],
-        "radius": 0.27907
-      },
-      "ion_18": {
-        "center": [
-          0,
-          0.41623,
-          0.41623
-        ],
-        "radius": 0.27907
-      },
-      "ion_19": {
-        "center": [
-          0.41623,
-          -0.41623,
-          -0.41623
-        ],
-        "radius": 0.27907
-      },
-      "ion_20": {
-        "center": [
-          0.41623,
-          -0.41623,
-          0
-        ],
-        "radius": 0.27907
-      },
-      "ion_21": {
-        "center": [
-          0.41623,
           -0.41623,
           0.41623
         ],
         "radius": 0.27907
       },
-      "ion_22": {
+      "anion_13": {
+        "center": [
+          0,
+          0,
+          -0.41623
+        ],
+        "radius": 0.27907
+      },
+      "cation_14": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.27907
+      },
+      "anion_15": {
+        "center": [
+          0,
+          0,
+          0.41623
+        ],
+        "radius": 0.27907
+      },
+      "cation_16": {
+        "center": [
+          0,
+          0.41623,
+          -0.41623
+        ],
+        "radius": 0.27907
+      },
+      "anion_17": {
+        "center": [
+          0,
+          0.41623,
+          0
+        ],
+        "radius": 0.27907
+      },
+      "cation_18": {
+        "center": [
+          0,
+          0.41623,
+          0.41623
+        ],
+        "radius": 0.27907
+      },
+      "anion_19": {
+        "center": [
+          0.41623,
+          -0.41623,
+          -0.41623
+        ],
+        "radius": 0.27907
+      },
+      "cation_20": {
+        "center": [
+          0.41623,
+          -0.41623,
+          0
+        ],
+        "radius": 0.27907
+      },
+      "anion_21": {
+        "center": [
+          0.41623,
+          -0.41623,
+          0.41623
+        ],
+        "radius": 0.27907
+      },
+      "cation_22": {
         "center": [
           0.41623,
           0,
@@ -6459,7 +6765,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_23": {
+      "anion_23": {
         "center": [
           0.41623,
           0,
@@ -6467,7 +6773,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_24": {
+      "cation_24": {
         "center": [
           0.41623,
           0,
@@ -6475,7 +6781,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_25": {
+      "anion_25": {
         "center": [
           0.41623,
           0.41623,
@@ -6483,7 +6789,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_26": {
+      "cation_26": {
         "center": [
           0.41623,
           0.41623,
@@ -6491,7 +6797,7 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.27907
       },
-      "ion_27": {
+      "anion_27": {
         "center": [
           0.41623,
           0.41623,
@@ -6595,13 +6901,445 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
         ],
         "radius": 0.41682
       },
-      "cation": {
+      "ionic_bond_1": {
+        "center": [
+          -0.41623,
+          -0.41623,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_2": {
+        "center": [
+          -0.41623,
+          -0.41623,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_3": {
+        "center": [
+          -0.41623,
+          -0.20811,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_4": {
+        "center": [
+          -0.20811,
+          -0.41623,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_5": {
+        "center": [
+          -0.41623,
+          -0.20811,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_6": {
+        "center": [
+          -0.41623,
+          0,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_7": {
+        "center": [
+          -0.41623,
+          0.20812,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_8": {
+        "center": [
+          -0.20811,
+          0,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_9": {
+        "center": [
+          -0.41623,
+          -0.20811,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_10": {
+        "center": [
+          -0.41623,
+          0,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_11": {
+        "center": [
+          -0.41623,
+          0.20812,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_12": {
+        "center": [
+          -0.20811,
+          0,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_13": {
+        "center": [
+          -0.41623,
+          0.20812,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_14": {
+        "center": [
+          -0.41623,
+          0.41623,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_15": {
+        "center": [
+          -0.41623,
+          0.41623,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_16": {
+        "center": [
+          -0.20811,
+          0.41623,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_17": {
+        "center": [
+          -0.20811,
+          -0.41623,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_18": {
+        "center": [
+          0,
+          -0.41623,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_19": {
+        "center": [
+          0,
+          -0.20811,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_20": {
+        "center": [
+          0.20812,
+          -0.41623,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_21": {
+        "center": [
+          -0.20811,
+          -0.41623,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_22": {
+        "center": [
+          0,
+          -0.41623,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_23": {
+        "center": [
+          0,
+          -0.20811,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_24": {
+        "center": [
+          0.20812,
+          -0.41623,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_25": {
+        "center": [
+          -0.20811,
+          0,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_26": {
+        "center": [
+          0,
+          -0.20811,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_27": {
+        "center": [
+          0,
+          0,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_28": {
+        "center": [
+          0,
+          0,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_29": {
+        "center": [
+          0,
+          0.20812,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_30": {
+        "center": [
+          0.20812,
+          0,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_31": {
+        "center": [
+          -0.20811,
+          0.41623,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_32": {
+        "center": [
+          0,
+          0.20812,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_33": {
+        "center": [
+          0,
+          0.41623,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_34": {
+        "center": [
+          0.20812,
+          0.41623,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_35": {
+        "center": [
+          -0.20811,
+          0.41623,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_36": {
+        "center": [
+          0,
+          0.20812,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_37": {
+        "center": [
+          0,
+          0.41623,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_38": {
+        "center": [
+          0.20812,
+          0.41623,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_39": {
+        "center": [
+          0.20812,
+          -0.41623,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_40": {
+        "center": [
+          0.41623,
+          -0.41623,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_41": {
+        "center": [
+          0.41623,
+          -0.41623,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_42": {
+        "center": [
+          0.41623,
+          -0.20811,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_43": {
+        "center": [
+          0.20812,
+          0,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_44": {
+        "center": [
+          0.41623,
+          -0.20811,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_45": {
+        "center": [
+          0.41623,
+          0,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_46": {
+        "center": [
+          0.41623,
+          0.20812,
+          -0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_47": {
+        "center": [
+          0.20812,
+          0,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_48": {
+        "center": [
+          0.41623,
+          -0.20811,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_49": {
+        "center": [
+          0.41623,
+          0,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_50": {
+        "center": [
+          0.41623,
+          0.20812,
+          0.41623
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_51": {
+        "center": [
+          0.20812,
+          0.41623,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_52": {
+        "center": [
+          0.41623,
+          0.20812,
+          0
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_53": {
+        "center": [
+          0.41623,
+          0.41623,
+          -0.20811
+        ],
+        "radius": 0.20887
+      },
+      "ionic_bond_54": {
+        "center": [
+          0.41623,
+          0.41623,
+          0.20812
+        ],
+        "radius": 0.20887
+      },
+      "lattice_origin": {
         "center": [
           0,
           0,
           0
         ],
-        "radius": 0.27907
+        "radius": 0.18604
       }
     }
   },
@@ -6942,76 +7680,94 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 5,
-    "meshCount": 5,
-    "materialCount": 5,
+    "partCount": 7,
+    "meshCount": 7,
+    "materialCount": 7,
     "bounds": {
       "min": [
-        -0.70696,
-        -0.0206,
-        -0.70696
+        -0.68005,
+        -0.274,
+        -0.68005
       ],
       "max": [
-        0.70696,
-        0.0206,
-        0.70696
+        0.68005,
+        0.274,
+        0.68005
       ],
       "size": [
-        1.41392,
-        0.0412,
-        1.41392
+        1.3601,
+        0.548,
+        1.3601
       ],
-      "radius": 1
+      "radius": 1.00001
     },
-    "triangles": 1600,
-    "bytes": 38584,
+    "triangles": 4218,
+    "bytes": 97636,
     "semanticAnchors": [
       "inner_core",
       "outer_core",
       "lower_mantle",
       "upper_mantle",
-      "crust"
+      "crust",
+      "cmb_marker",
+      "depth_scale"
     ],
     "anchors": {
       "inner_core": {
         "center": [
-          0.00018,
           0,
-          -0.00018
+          -0.25419,
+          0
         ],
-        "radius": 0.34036
+        "radius": 0.3274
       },
       "outer_core": {
         "center": [
-          0.00012,
           0,
-          -0.00012
+          -0.25419,
+          0
         ],
-        "radius": 0.56336
+        "radius": 0.54192
       },
       "lower_mantle": {
         "center": [
-          0.00006,
           0,
-          -0.00006
+          -0.25419,
+          0
         ],
-        "radius": 0.78651
+        "radius": 0.75657
       },
       "upper_mantle": {
         "center": [
-          0.00002,
           0,
-          -0.00002
+          -0.25419,
+          0
         ],
-        "radius": 0.92237
+        "radius": 0.88726
       },
       "crust": {
         "center": [
           0,
-          0,
+          -0.25419,
           0
         ],
-        "radius": 1
+        "radius": 0.96194
+      },
+      "cmb_marker": {
+        "center": [
+          0,
+          0.2608,
+          0.33012
+        ],
+        "radius": 0.29909
+      },
+      "depth_scale": {
+        "center": [
+          -0.03961,
+          -0.12214,
+          0.5612
+        ],
+        "radius": 0.24268
       }
     }
   },
@@ -7029,76 +7785,103 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 5,
-    "meshCount": 5,
-    "materialCount": 3,
+    "partCount": 8,
+    "meshCount": 8,
+    "materialCount": 6,
     "bounds": {
       "min": [
-        -0.62612,
-        -0.4647,
-        -0.62612
+        -0.60689,
+        -0.51318,
+        -0.60689
       ],
       "max": [
-        0.62612,
-        0.4647,
-        0.62612
+        0.60689,
+        0.51318,
+        0.60689
       ],
       "size": [
-        1.25224,
-        0.9294,
-        1.25224
+        1.21378,
+        1.02636,
+        1.21378
       ],
-      "radius": 1
+      "radius": 0.99999
     },
-    "triangles": 4352,
-    "bytes": 90724,
+    "triangles": 7672,
+    "bytes": 157960,
     "semanticAnchors": [
-      "atmosphere",
       "troposphere",
+      "stratosphere",
+      "atmosphere",
       "cloud_layer_1",
       "cloud_layer_2",
-      "cloud_layer_3"
+      "cloud_layer_3",
+      "jet_stream",
+      "ozone_layer"
     ],
     "anchors": {
-      "atmosphere": {
-        "center": [
-          0,
-          0.02446,
-          0
-        ],
-        "radius": 0.88633
-      },
       "troposphere": {
         "center": [
           0,
-          0.02446,
+          0,
           0
         ],
-        "radius": 0.79591
+        "radius": 0.72609
+      },
+      "stratosphere": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.75752
+      },
+      "atmosphere": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.85901
       },
       "cloud_layer_1": {
         "center": [
-          0.19566,
-          0.2935,
-          0.2935
+          0.1785,
+          0.24544,
+          0.26775
         ],
-        "radius": 0.29654
+        "radius": 0.27052
       },
       "cloud_layer_2": {
         "center": [
-          -0.29349,
-          -0.07337,
-          0.24458
+          -0.26775,
+          -0.08925,
+          0.22312
         ],
-        "radius": 0.23723
+        "radius": 0.21642
       },
       "cloud_layer_3": {
         "center": [
-          0.04892,
-          -0.31795,
-          -0.19566
+          0.04463,
+          -0.31237,
+          -0.17849
         ],
-        "radius": 0.25417
+        "radius": 0.23188
+      },
+      "jet_stream": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.6653
+      },
+      "ozone_layer": {
+        "center": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.88885
       }
     }
   },
@@ -7821,40 +8604,58 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 1,
-    "meshCount": 1,
-    "materialCount": 1,
+    "partCount": 3,
+    "meshCount": 3,
+    "materialCount": 3,
     "bounds": {
       "min": [
-        -0.57735,
-        -0.57735,
-        -0.57735
+        -0.48507,
+        -0.48507,
+        -0.72761
       ],
       "max": [
-        0.57735,
-        0.57735,
-        0.57735
+        0.48507,
+        0.48507,
+        0.72761
       ],
       "size": [
-        1.1547,
-        1.1547,
-        1.1547
+        0.97014,
+        0.97014,
+        1.45522
       ],
       "radius": 1
     },
-    "triangles": 2000,
-    "bytes": 39604,
+    "triangles": 3370,
+    "bytes": 68504,
     "semanticAnchors": [
-      "mercury"
+      "mercury",
+      "diameter_marker",
+      "size_annotation"
     ],
     "anchors": {
       "mercury": {
         "center": [
           0,
           0,
-          0
+          -0.26679
         ],
-        "radius": 1
+        "radius": 0.79816
+      },
+      "diameter_marker": {
+        "center": [
+          0,
+          0,
+          -0.26679
+        ],
+        "radius": 0.6861
+      },
+      "size_annotation": {
+        "center": [
+          0,
+          0,
+          0.3153
+        ],
+        "radius": 0.44574
       }
     }
   },
@@ -8445,76 +9246,112 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 5,
-    "meshCount": 5,
-    "materialCount": 4,
+    "partCount": 9,
+    "meshCount": 9,
+    "materialCount": 7,
     "bounds": {
       "min": [
-        -0.66348,
-        -0.17665,
-        -0.72704
+        -0.66343,
+        -0.17717,
+        -0.72697
       ],
       "max": [
-        0.66348,
-        0.17665,
-        0.72704
+        0.66343,
+        0.17717,
+        0.72697
       ],
       "size": [
-        1.32696,
-        0.3533,
-        1.45408
+        1.32686,
+        0.35434,
+        1.45394
       ],
-      "radius": 1
+      "radius": 1.00001
     },
-    "triangles": 9024,
-    "bytes": 179372,
+    "triangles": 16268,
+    "bytes": 319744,
     "semanticAnchors": [
       "galactic_core",
+      "galactic_nucleus_bulge",
       "galactic_disk",
       "galactic_disk_outer",
       "spiral_arm_1",
-      "spiral_arm_2"
+      "spiral_arm_2",
+      "star_cluster_1",
+      "star_cluster_2",
+      "dust_lane_1"
     ],
     "anchors": {
       "galactic_core": {
         "center": [
           0,
-          0,
+          0.00054,
           0
         ],
-        "radius": 0.16576
+        "radius": 0.16574
+      },
+      "galactic_nucleus_bulge": {
+        "center": [
+          0,
+          0.00054,
+          0
+        ],
+        "radius": 0.24625
       },
       "galactic_disk": {
         "center": [
           0,
-          0,
+          0.00054,
           0
         ],
-        "radius": 0.61437
+        "radius": 0.61432
       },
       "galactic_disk_outer": {
         "center": [
           0,
-          0,
+          0.00054,
           0
         ],
-        "radius": 0.94929
+        "radius": 0.94921
       },
       "spiral_arm_1": {
         "center": [
-          -0.15922,
-          0.01627,
-          -0.18259
+          -0.15921,
+          0.0168,
+          -0.18257
         ],
-        "radius": 0.66851
+        "radius": 0.66845
       },
       "spiral_arm_2": {
         "center": [
-          0.15923,
-          0.01627,
-          0.18259
+          0.15921,
+          0.0168,
+          0.18258
         ],
-        "radius": 0.66851
+        "radius": 0.66845
+      },
+      "star_cluster_1": {
+        "center": [
+          0.49212,
+          0.08256,
+          0.05468
+        ],
+        "radius": 0.05683
+      },
+      "star_cluster_2": {
+        "center": [
+          -0.57413,
+          -0.13616,
+          0.10936
+        ],
+        "radius": 0.07103
+      },
+      "dust_lane_1": {
+        "center": [
+          0.40382,
+          -0.04706,
+          -0.05466
+        ],
+        "radius": 0.23298
       }
     }
   },
@@ -9618,29 +10455,29 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 62,
-    "meshCount": 62,
-    "materialCount": 15,
+    "partCount": 64,
+    "meshCount": 64,
+    "materialCount": 17,
     "bounds": {
       "min": [
-        -0.55717,
-        -0.69474,
-        -0.45485
+        -0.76548,
+        -0.51228,
+        -0.38936
       ],
       "max": [
-        0.55717,
-        0.69474,
-        0.45485
+        0.76548,
+        0.51228,
+        0.38936
       ],
       "size": [
-        1.11434,
-        1.38948,
-        0.9097
+        1.53096,
+        1.02456,
+        0.77872
       ],
       "radius": 1
     },
-    "triangles": 840,
-    "bytes": 87744,
+    "triangles": 2672,
+    "bytes": 138640,
     "semanticAnchors": [
       "cpu_package",
       "package_substrate",
@@ -9703,504 +10540,522 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "bus_trace_3",
       "bus_trace_4",
       "bus_trace_5",
-      "bus_trace_6"
+      "bus_trace_6",
+      "voltage_test_point",
+      "ground_test_point"
     ],
     "anchors": {
       "cpu_package": {
         "center": [
           0,
-          -0.0963,
-          0.04386
+          0,
+          0.03754
         ],
-        "radius": 0.73025
+        "radius": 0.62511
       },
       "package_substrate": {
         "center": [
           0,
-          -0.0963,
-          0.00946
+          0,
+          0.0081
         ],
-        "radius": 0.78808
+        "radius": 0.67461
       },
       "silicon_die": {
         "center": [
           0,
-          -0.0963,
-          0.09888
+          0,
+          0.08465
         ],
-        "radius": 0.4391
+        "radius": 0.37588
       },
       "cpu_core_1": {
         "center": [
-          -0.15133,
-          0.05503,
-          0.14015
+          -0.12954,
+          0.12955,
+          0.11998
         ],
-        "radius": 0.15599
+        "radius": 0.13353
       },
       "cpu_core_2": {
         "center": [
-          0.15133,
-          0.05503,
-          0.14015
+          0.12955,
+          0.12955,
+          0.11998
         ],
-        "radius": 0.15599
+        "radius": 0.13353
       },
       "cpu_core_3": {
         "center": [
-          -0.15133,
-          -0.24763,
-          0.14015
+          -0.12954,
+          -0.12954,
+          0.11998
         ],
-        "radius": 0.15599
+        "radius": 0.13353
       },
       "cpu_core_4": {
         "center": [
-          0.15133,
-          -0.24763,
-          0.14015
+          0.12955,
+          -0.12954,
+          0.11998
         ],
-        "radius": 0.15599
+        "radius": 0.13353
       },
       "cpu_fabric": {
         "center": [
           0,
-          -0.0963,
-          0.14015
+          0,
+          0.11998
         ],
-        "radius": 0.24858
+        "radius": 0.2128
       },
       "cpu_fabric_cross": {
         "center": [
           0,
-          -0.0963,
-          0.14015
+          0,
+          0.11998
         ],
-        "radius": 0.24858
+        "radius": 0.2128
       },
       "l2_cache": {
         "center": [
-          0.35769,
-          0.26138,
-          0.14015
+          0.30619,
+          0.30619,
+          0.11998
         ],
-        "radius": 0.17524
+        "radius": 0.15001
       },
       "l3_cache": {
         "center": [
-          -0.34393,
-          0.27515,
-          0.14015
+          -0.29441,
+          0.31797,
+          0.11998
         ],
-        "radius": 0.17765
+        "radius": 0.15207
       },
       "memory_controller": {
         "center": [
-          0.34394,
-          -0.46774,
-          0.14015
+          0.29442,
+          -0.31797,
+          0.11998
         ],
-        "radius": 0.16059
+        "radius": 0.13746
       },
       "io_controller": {
         "center": [
-          -0.35769,
-          -0.454,
-          0.14015
+          -0.30619,
+          -0.30619,
+          0.11998
         ],
-        "radius": 0.12814
+        "radius": 0.10969
       },
       "heat_spreader": {
         "center": [
           0,
-          -0.0963,
-          0.27773
+          0,
+          0.23774
         ],
-        "radius": 0.64296
+        "radius": 0.55039
       },
       "thermal_interface": {
         "center": [
           0,
-          -0.0963,
-          0.23646
+          0,
+          0.20241
         ],
-        "radius": 0.66153
+        "radius": 0.5663
       },
       "heatsink_fins": {
         "center": [
           0,
-          -0.0963,
-          0.03009
+          0,
+          0.02576
         ],
-        "radius": 0.65773
+        "radius": 0.56303
       },
       "heatsink_base": {
         "center": [
           0,
-          -0.0963,
-          -0.43765
+          0,
+          -0.37464
         ],
-        "radius": 0.71034
+        "radius": 0.60808
       },
       "alignment_marker": {
         "center": [
-          -0.45399,
-          -0.55029,
-          0.34651
+          -0.38863,
+          -0.38863,
+          0.29663
         ],
-        "radius": 0.06844
+        "radius": 0.05859
       },
       "mounting_notch_1": {
         "center": [
           0,
-          0.44024,
-          0.04385
+          0.45928,
+          0.03754
         ],
-        "radius": 0.07872
+        "radius": 0.06739
       },
       "mounting_notch_2": {
         "center": [
           0,
-          -0.63283,
-          0.04385
+          -0.45928,
+          0.03754
         ],
-        "radius": 0.07872
+        "radius": 0.06739
       },
       "lga_contact_1": {
         "center": [
-          -0.42647,
-          -0.52277,
-          -0.01806
+          -0.36507,
+          -0.36508,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_2": {
         "center": [
-          -0.25451,
-          -0.52277,
-          -0.01806
+          -0.21787,
+          -0.36508,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_3": {
         "center": [
-          -0.08254,
-          -0.52277,
-          -0.01806
+          -0.07066,
+          -0.36508,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_4": {
         "center": [
-          0.08943,
-          -0.52277,
-          -0.01806
+          0.07655,
+          -0.36508,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_5": {
         "center": [
-          0.26139,
-          -0.52277,
-          -0.01806
+          0.22375,
+          -0.36508,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_6": {
         "center": [
-          0.43336,
-          -0.52277,
-          -0.01806
+          0.37097,
+          -0.36508,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_7": {
         "center": [
-          -0.42647,
-          -0.35081,
-          -0.01806
+          -0.36507,
+          -0.21787,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_8": {
         "center": [
-          -0.25451,
-          -0.35081,
-          -0.01806
+          -0.21787,
+          -0.21787,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_9": {
         "center": [
-          -0.08254,
-          -0.35081,
-          -0.01806
+          -0.07066,
+          -0.21787,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_10": {
         "center": [
-          0.08943,
-          -0.35081,
-          -0.01806
+          0.07655,
+          -0.21787,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_11": {
         "center": [
-          0.26139,
-          -0.35081,
-          -0.01806
+          0.22375,
+          -0.21787,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_12": {
         "center": [
-          0.43336,
-          -0.35081,
-          -0.01806
+          0.37097,
+          -0.21787,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_13": {
         "center": [
-          -0.42647,
-          -0.17884,
-          -0.01806
+          -0.36507,
+          -0.07066,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_14": {
         "center": [
-          -0.25451,
-          -0.17884,
-          -0.01806
+          -0.21787,
+          -0.07066,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_15": {
         "center": [
-          -0.08254,
-          -0.17884,
-          -0.01806
+          -0.07066,
+          -0.07066,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_16": {
         "center": [
-          0.08943,
-          -0.17884,
-          -0.01806
+          0.07655,
+          -0.07066,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_17": {
         "center": [
-          0.26139,
-          -0.17884,
-          -0.01806
+          0.22375,
+          -0.07066,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_18": {
         "center": [
-          0.43336,
-          -0.17884,
-          -0.01806
+          0.37097,
+          -0.07066,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_19": {
         "center": [
-          -0.42647,
-          -0.00688,
-          -0.01806
+          -0.36507,
+          0.07655,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_20": {
         "center": [
-          -0.25451,
-          -0.00688,
-          -0.01806
+          -0.21787,
+          0.07655,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_21": {
         "center": [
-          -0.08254,
-          -0.00688,
-          -0.01806
+          -0.07066,
+          0.07655,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_22": {
         "center": [
-          0.08943,
-          -0.00688,
-          -0.01806
+          0.07655,
+          0.07655,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_23": {
         "center": [
-          0.26139,
-          -0.00688,
-          -0.01806
+          0.22375,
+          0.07655,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_24": {
         "center": [
-          0.43336,
-          -0.00688,
-          -0.01806
+          0.37097,
+          0.07655,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_25": {
         "center": [
-          -0.42647,
-          0.16508,
-          -0.01806
+          -0.36507,
+          0.22375,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_26": {
         "center": [
-          -0.25451,
-          0.16508,
-          -0.01806
+          -0.21787,
+          0.22375,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_27": {
         "center": [
-          -0.08254,
-          0.16508,
-          -0.01806
+          -0.07066,
+          0.22375,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_28": {
         "center": [
-          0.08943,
-          0.16508,
-          -0.01806
+          0.07655,
+          0.22375,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_29": {
         "center": [
-          0.26139,
-          0.16508,
-          -0.01806
+          0.22375,
+          0.22375,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_30": {
         "center": [
-          0.43336,
-          0.16508,
-          -0.01806
+          0.37097,
+          0.22375,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_31": {
         "center": [
-          -0.42647,
-          0.33706,
-          -0.01806
+          -0.36507,
+          0.37097,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_32": {
         "center": [
-          -0.25451,
-          0.33706,
-          -0.01806
+          -0.21787,
+          0.37097,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_33": {
         "center": [
-          -0.08254,
-          0.33706,
-          -0.01806
+          -0.07066,
+          0.37097,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_34": {
         "center": [
-          0.08943,
-          0.33706,
-          -0.01806
+          0.07655,
+          0.37097,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_35": {
         "center": [
-          0.26139,
-          0.33706,
-          -0.01806
+          0.22375,
+          0.37097,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "lga_contact_36": {
         "center": [
-          0.43336,
-          0.33706,
-          -0.01806
+          0.37097,
+          0.37097,
+          -0.01546
         ],
-        "radius": 0.04972
+        "radius": 0.04256
       },
       "bus_trace_1": {
         "center": [
-          -0.4815,
-          0.28203,
-          0.15391
+          -0.41218,
+          0.32386,
+          0.13175
         ],
-        "radius": 0.41279
+        "radius": 0.35369
       },
       "bus_trace_2": {
         "center": [
-          -0.2889,
-          0.28203,
-          0.15391
+          -0.24731,
+          0.32386,
+          0.13175
         ],
-        "radius": 0.41279
+        "radius": 0.35369
       },
       "bus_trace_3": {
         "center": [
-          -0.0963,
-          0.28203,
-          0.15391
+          -0.08244,
+          0.32386,
+          0.13175
         ],
-        "radius": 0.41279
+        "radius": 0.35369
       },
       "bus_trace_4": {
         "center": [
-          0.0963,
-          0.28203,
-          0.15391
+          0.08244,
+          0.32386,
+          0.13175
         ],
-        "radius": 0.41279
+        "radius": 0.35369
       },
       "bus_trace_5": {
         "center": [
-          0.2889,
-          0.28203,
-          0.15391
+          0.24731,
+          0.32386,
+          0.13175
         ],
-        "radius": 0.41279
+        "radius": 0.35369
       },
       "bus_trace_6": {
         "center": [
-          0.4815,
-          0.28203,
-          0.15391
+          0.41218,
+          0.32386,
+          0.13175
         ],
-        "radius": 0.41279
+        "radius": 0.35369
+      },
+      "voltage_test_point": {
+        "center": [
+          0.38863,
+          0.38863,
+          0.29662
+        ],
+        "radius": 0.05133
+      },
+      "ground_test_point": {
+        "center": [
+          -0.38863,
+          -0.38863,
+          0.29662
+        ],
+        "radius": 0.05133
       }
     }
   },
@@ -10218,29 +11073,29 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
     ],
     "boundingRadius": 1,
     "recommendedCameraDistance": 4.185,
-    "partCount": 50,
-    "meshCount": 50,
-    "materialCount": 13,
+    "partCount": 52,
+    "meshCount": 52,
+    "materialCount": 14,
     "bounds": {
       "min": [
-        -0.94382,
-        -0.28923,
-        -0.15984
+        -0.72763,
+        -0.67481,
+        -0.12323
       ],
       "max": [
-        0.94382,
-        0.28923,
-        0.15984
+        0.72763,
+        0.67481,
+        0.12323
       ],
       "size": [
-        1.88764,
-        0.57846,
-        0.31968
+        1.45526,
+        1.34962,
+        0.24646
       ],
       "radius": 1
     },
-    "triangles": 684,
-    "bytes": 71096,
+    "triangles": 2728,
+    "bytes": 129044,
     "semanticAnchors": [
       "pcb",
       "dram_bank_1",
@@ -10289,7 +11144,9 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "heat_spreader",
       "heat_spreader_fins",
       "memory_bank_label",
-      "rgb_diffuser",
+      "voltage_annotation",
+      "ground_annotation",
+      "capacity_annotation",
       "side_latch_1",
       "side_latch_2"
     ],
@@ -10297,402 +11154,418 @@ export const GENERATED_ASSETS: GeneratedAsset[] = [
       "pcb": {
         "center": [
           0,
-          0.02029,
-          -0.03298
+          0.03717,
+          -0.02543
         ],
-        "radius": 0.90942
+        "radius": 0.70111
       },
       "dram_bank_1": {
         "center": [
-          -0.6698,
-          0.0406,
-          0.04821
+          -0.51638,
+          0.05281,
+          0.03717
         ],
-        "radius": 0.22464
+        "radius": 0.17319
       },
       "dram_bank_2": {
         "center": [
-          -0.22327,
-          0.0406,
-          0.04821
+          -0.17212,
+          0.05281,
+          0.03717
         ],
-        "radius": 0.22465
+        "radius": 0.17319
       },
       "dram_bank_3": {
         "center": [
-          0.22327,
-          0.0406,
-          0.04821
+          0.17213,
+          0.05281,
+          0.03717
         ],
-        "radius": 0.22465
+        "radius": 0.17319
       },
       "dram_bank_4": {
         "center": [
-          0.66981,
-          0.0406,
-          0.04821
+          0.51638,
+          0.05281,
+          0.03717
         ],
-        "radius": 0.22464
+        "radius": 0.17319
       },
       "memory_chip_1": {
         "center": [
-          -0.7104,
-          0.0406,
-          0.07865
+          -0.54767,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09066
       },
       "memory_chip_2": {
         "center": [
-          -0.50743,
-          0.0406,
-          0.07865
+          -0.3912,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09065
       },
       "memory_chip_3": {
         "center": [
-          -0.30446,
-          0.0406,
-          0.07865
+          -0.23472,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09065
       },
       "memory_chip_4": {
         "center": [
-          -0.10148,
-          0.0406,
-          0.07865
+          -0.07824,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09065
       },
       "memory_chip_5": {
         "center": [
-          0.10149,
-          0.0406,
-          0.07865
+          0.07824,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09065
       },
       "memory_chip_6": {
         "center": [
-          0.30446,
-          0.0406,
-          0.07865
+          0.23472,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09065
       },
       "memory_chip_7": {
         "center": [
-          0.50743,
-          0.0406,
-          0.07865
+          0.3912,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09065
       },
       "memory_chip_8": {
         "center": [
-          0.71041,
-          0.0406,
-          0.07865
+          0.54768,
+          0.05281,
+          0.06064
         ],
-        "radius": 0.15877
+        "radius": 0.09066
       },
       "memory_trace_1": {
         "center": [
           0,
-          -0.14208,
-          0.00761
+          -0.08802,
+          0.00587
         ],
-        "radius": 0.76119
+        "radius": 0.58695
       },
       "memory_trace_2": {
         "center": [
           0,
-          -0.09641,
-          0.00761
+          -0.05281,
+          0.00587
         ],
-        "radius": 0.76119
+        "radius": 0.58695
       },
       "memory_trace_3": {
         "center": [
           0,
-          -0.05074,
-          0.00761
+          -0.01761,
+          0.00587
         ],
-        "radius": 0.76119
+        "radius": 0.58695
       },
       "memory_trace_4": {
         "center": [
           0,
-          -0.00507,
-          0.00761
+          0.01761,
+          0.00587
         ],
-        "radius": 0.76119
+        "radius": 0.58695
       },
       "memory_trace_5": {
         "center": [
           0,
-          0.0406,
-          0.00761
+          0.05282,
+          0.00587
         ],
-        "radius": 0.76119
+        "radius": 0.58695
       },
       "memory_trace_6": {
         "center": [
           0,
-          0.08626,
-          0.00761
+          0.08802,
+          0.00587
         ],
-        "radius": 0.76119
+        "radius": 0.58695
       },
       "spd_chip": {
         "center": [
-          -0.79159,
-          0.16238,
-          0.07865
+          -0.61027,
+          0.1467,
+          0.06064
         ],
-        "radius": 0.08963
+        "radius": 0.0691
       },
       "gold_contact_edge": {
         "center": [
           0,
-          -0.23342,
-          -0.01268
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.81332
+        "radius": 0.62702
       },
       "contact_pin_1": {
         "center": [
-          -0.7307,
-          -0.23341,
-          -0.01269
+          -0.56333,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_2": {
         "center": [
-          -0.66067,
-          -0.23341,
-          -0.01269
+          -0.50934,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_3": {
         "center": [
-          -0.59065,
-          -0.23341,
-          -0.01269
+          -0.45535,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_4": {
         "center": [
-          -0.52062,
-          -0.23341,
-          -0.01269
+          -0.40137,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_5": {
         "center": [
-          -0.45059,
-          -0.23341,
-          -0.01269
+          -0.34738,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_6": {
         "center": [
-          -0.38057,
-          -0.23341,
-          -0.01269
+          -0.2934,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_7": {
         "center": [
-          -0.31054,
-          -0.23341,
-          -0.01269
+          -0.23941,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_8": {
         "center": [
-          -0.24052,
-          -0.23341,
-          -0.01269
+          -0.18543,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_9": {
         "center": [
-          -0.17049,
-          -0.23341,
-          -0.01269
+          -0.13144,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_10": {
         "center": [
-          -0.10047,
-          -0.23341,
-          -0.01269
+          -0.07746,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_11": {
         "center": [
-          -0.03044,
-          -0.23341,
-          -0.01269
+          -0.02347,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_12": {
         "center": [
-          0.03958,
-          -0.23341,
-          -0.01269
+          0.03052,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_13": {
         "center": [
-          0.10961,
-          -0.23341,
-          -0.01269
+          0.0845,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_14": {
         "center": [
-          0.17963,
-          -0.23341,
-          -0.01269
+          0.13849,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_15": {
         "center": [
-          0.24966,
-          -0.23341,
-          -0.01269
+          0.19247,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_16": {
         "center": [
-          0.31968,
-          -0.23341,
-          -0.01269
+          0.24646,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_17": {
         "center": [
-          0.38971,
-          -0.23341,
-          -0.01269
+          0.30044,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_18": {
         "center": [
-          0.45973,
-          -0.23341,
-          -0.01269
+          0.35443,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_19": {
         "center": [
-          0.52976,
-          -0.23341,
-          -0.01269
+          0.40841,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_20": {
         "center": [
-          0.59978,
-          -0.23341,
-          -0.01269
+          0.4624,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_21": {
         "center": [
-          0.66981,
-          -0.23341,
-          -0.01269
+          0.51638,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "contact_pin_22": {
         "center": [
-          0.73984,
-          -0.23341,
-          -0.01269
+          0.57037,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.04685
+        "radius": 0.03591
       },
       "notch": {
         "center": [
-          0.22327,
-          -0.23341,
-          -0.01268
+          0.17213,
+          -0.15843,
+          -0.00978
         ],
-        "radius": 0.08818
+        "radius": 0.06799
       },
       "heat_spreader": {
         "center": [
           0,
-          0.08118,
-          -0.03299
+          0.08411,
+          -0.02543
         ],
-        "radius": 0.79069
+        "radius": 0.60958
       },
       "heat_spreader_fins": {
         "center": [
           0,
-          0.137,
-          0.1294
+          0.12714,
+          0.09976
         ],
-        "radius": 0.74701
+        "radius": 0.57589
       },
       "memory_bank_label": {
         "center": [
-          -0.40594,
-          0.22327,
-          0.07865
+          -0.31296,
+          0.19365,
+          0.06063
         ],
-        "radius": 0.25714
+        "radius": 0.19824
       },
-      "rgb_diffuser": {
+      "voltage_annotation": {
+        "center": [
+          0.54768,
+          0.1467,
+          0.06063
+        ],
+        "radius": 0.06821
+      },
+      "ground_annotation": {
+        "center": [
+          -0.54767,
+          0.1467,
+          0.06063
+        ],
+        "radius": 0.06821
+      },
+      "capacity_annotation": {
         "center": [
           0,
-          0.26386,
-          0.06851
+          0.19365,
+          0.06064
         ],
-        "radius": 0.81254
+        "radius": 0.05588
       },
       "side_latch_1": {
         "center": [
-          -0.91337,
-          0,
-          -0.03298
+          -0.70415,
+          0.02152,
+          -0.02543
         ],
-        "radius": 0.19202
+        "radius": 0.14804
       },
       "side_latch_2": {
         "center": [
-          0.91338,
-          0,
-          -0.03298
+          0.70416,
+          0.02152,
+          -0.02543
         ],
-        "radius": 0.19202
+        "radius": 0.14804
       }
     }
   },
