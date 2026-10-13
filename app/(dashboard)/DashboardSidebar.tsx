@@ -38,23 +38,23 @@ export default function DashboardSidebar({ user }: { user: User }) {
         </Link>
         <ul className="sidebar-menu">
           <li>
-            <Link href="/dashboard" className={sidebarLinkClass(isLessonsActive)}>
-              <svg
-                className="icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden="true"
-              >
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-              <span>Lessons</span>
-            </Link>
+             <Link href="/dashboard" className={sidebarLinkClass(isLessonsActive)} aria-current={isLessonsActive ? "page" : undefined}>
+               <svg
+                 className="icon"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 strokeWidth="2"
+                 aria-hidden="true"
+               >
+                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                 <polyline points="9 22 9 12 15 12 15 22" />
+               </svg>
+               <span>Lessons</span>
+             </Link>
           </li>
           <li>
-            <Link href="/dashboard/new" className={sidebarLinkClass(isNewActive)}>
+             <Link href="/dashboard/new" className={sidebarLinkClass(isNewActive)} aria-current={isNewActive ? "page" : undefined}>
               <svg
                 className="icon"
                 viewBox="0 0 24 24"
@@ -70,7 +70,7 @@ export default function DashboardSidebar({ user }: { user: User }) {
             </Link>
           </li>
           <li>
-            <Link href="/settings" className={sidebarLinkClass(isSettingsActive)}>
+             <Link href="/settings" className={sidebarLinkClass(isSettingsActive)} aria-current={isSettingsActive ? "page" : undefined}>
               <svg
                 className="icon"
                 viewBox="0 0 24 24"

@@ -3,6 +3,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import NewLessonForm from "./NewLessonForm";
 
+export const metadata = {
+  title: "New Lesson",
+  description: "Start a new lesson on any topic with your AI teacher.",
+};
+
 export default async function NewLessonPage() {
   const user = await getUser();
   if (!user) redirect("/login");

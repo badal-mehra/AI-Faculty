@@ -15,7 +15,7 @@ export default async function DashboardLayout({
       <DashboardSidebar user={user} />
       <main className="dashboard-main">
         <header className="dashboard-header">
-          <h1>AI Faculty</h1>
+          <div className="dashboard-header-title">AI Faculty</div>
         </header>
         <div className="dashboard-content">{children}</div>
       </main>

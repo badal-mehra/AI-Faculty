@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/supabase/auth";
+import { normalizeLanguage } from "@/lib/teaching/normalize";
 
 export async function GET() {
   const user = await getUser();
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
         title: title || topic,
         topic,
         subject: subject || null,
-        preferred_language: preferred_language || "en",
+        preferred_language: normalizeLanguage(preferred_language),
         teaching_depth: teaching_depth || "beginner",
         board_state: board_state || { nodes: [], edges: [], texts: [], highlights: [] },
         visual_state: visual_state || { objects: [], tick: 0 },

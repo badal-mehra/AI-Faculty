@@ -538,12 +538,13 @@ const playStoredLessonStep = useCallback((step: TeachingResponse) => {
           }).catch(() => {});
         }
       }
-    } catch {
+    } catch (err) {
+      console.error("[Classroom] requestTeachingLesson error:", err);
       if (stepRequestIdRef.current !== requestId) return;
       endContinuous("stop");
       // A failed FIRST request returns the student to the setup form so they can retry.
       if (starting) setLessonStarted(false);
-      setError(START_FAILURE_MESSAGE);
+      setError((err instanceof Error && err.message !== START_FAILURE_MESSAGE ? err.message : START_FAILURE_MESSAGE));
     } finally {
       if (inFlightIdRef.current === requestId) inFlightIdRef.current = null;
       if (stepRequestIdRef.current === requestId) setIsLoading(false);
