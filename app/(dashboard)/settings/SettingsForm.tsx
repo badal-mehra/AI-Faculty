@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { TEACHING_LANGUAGES, type TeachingLanguage } from "@/lib/teaching/types";
+import { normalizeLanguage } from "@/lib/teaching/normalize";
 
 interface Profile {
   id: string;
@@ -14,7 +16,7 @@ interface Profile {
 
 export default function SettingsForm({ user, profile }: { user: any; profile: Profile | null }) {
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
-  const [preferredLanguage, setPreferredLanguage] = useState(profile?.preferred_language || "en");
+  const [preferredLanguage, setPreferredLanguage] = useState<TeachingLanguage>(normalizeLanguage(profile?.preferred_language));
   const [teachingDepth, setTeachingDepth] = useState(profile?.teaching_depth || "beginner");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +72,7 @@ export default function SettingsForm({ user, profile }: { user: any; profile: Pr
         {error && <div className="auth-error" role="alert">{error}</div>}
         {success && <div className="auth-success" role="status">{success}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="settings-form">
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
@@ -94,26 +96,19 @@ export default function SettingsForm({ user, profile }: { user: any; profile: Pr
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="preferredLanguage">Preferred Language</label>
-              <select
-                id="preferredLanguage"
-                value={preferredLanguage}
-                onChange={(e) => setPreferredLanguage(e.target.value)}
-                disabled={isLoading}
-              >
-                <option value="en">English</option>
-                <option value="hinglish">Hinglish</option>
-                <option value="hi">Hindi</option>
-                <option value="te">Telugu</option>
-                <option value="ta">Tamil</option>
-                <option value="kn">Kannada</option>
-                <option value="ml">Malayalam</option>
-                <option value="mr">Marathi</option>
-                <option value="bn">Bengali</option>
-                <option value="pa">Punjabi</option>
-              </select>
+           <div className="form-row">
+             <div className="form-group">
+               <label htmlFor="preferredLanguage">Preferred Language</label>
+               <select
+                 id="preferredLanguage"
+                 value={preferredLanguage}
+                 onChange={(e) => setPreferredLanguage(e.target.value as TeachingLanguage)}
+                 disabled={isLoading}
+               >
+                 {TEACHING_LANGUAGES.map((option) => (
+                   <option key={option} value={option}>{option}</option>
+                 ))}
+               </select>
             </div>
 
             <div className="form-group">

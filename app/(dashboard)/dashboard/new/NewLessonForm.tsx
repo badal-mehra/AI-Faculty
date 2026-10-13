@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { TEACHING_LANGUAGES, type TeachingLanguage } from "@/lib/teaching/types";
+import { normalizeLanguage } from "@/lib/teaching/normalize";
+import { emptyVisual3DScene } from "@/lib/visual3d/types";
 
 interface Profile {
   display_name: string | null;
@@ -12,7 +15,7 @@ interface Profile {
 
 export default function NewLessonForm({ profile }: { profile: Profile | null }) {
   const [question, setQuestion] = useState("");
-  const [language, setLanguage] = useState(profile?.preferred_language || "en");
+  const [language, setLanguage] = useState<TeachingLanguage>(normalizeLanguage(profile?.preferred_language));
   const [teachingDepth, setTeachingDepth] = useState(profile?.teaching_depth || "beginner");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +51,7 @@ export default function NewLessonForm({ profile }: { profile: Profile | null }) 
           teaching_depth: teachingDepth,
           board_state: { nodes: [], edges: [], texts: [], highlights: [] },
           visual_state: { objects: [], tick: 0 },
-          visual3d_state: { objects: [], flows: [], labels: [], annotations: [], camera: {}, bounds: {}, memory: {}, tick: 0 },
+          visual3d_state: emptyVisual3DScene(),
           status: "active",
           current_step_index: 0,
         })
@@ -112,42 +115,35 @@ export default function NewLessonForm({ profile }: { profile: Profile | null }) 
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="language">Language</label>
-              <select
-                id="language"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                disabled={isLoading}
-              >
-                <option value="en">English</option>
-                <option value="hinglish">Hinglish</option>
-                <option value="hi">Hindi</option>
-                <option value="te">Telugu</option>
-                <option value="ta">Tamil</option>
-                <option value="kn">Kannada</option>
-                <option value="ml">Malayalam</option>
-                <option value="mr">Marathi</option>
-                <option value="bn">Bengali</option>
-                <option value="pa">Punjabi</option>
-              </select>
-            </div>
+           <div className="form-row">
+             <div className="form-group">
+               <label htmlFor="language">Language</label>
+               <select
+                 id="language"
+                 value={language}
+                 onChange={(e) => setLanguage(e.target.value as TeachingLanguage)}
+                 disabled={isLoading}
+               >
+                 {TEACHING_LANGUAGES.map((option) => (
+                   <option key={option} value={option}>{option}</option>
+                 ))}
+               </select>
+             </div>
 
-            <div className="form-group">
-              <label htmlFor="teachingDepth">Teaching Depth</label>
-              <select
-                id="teachingDepth"
-                value={teachingDepth}
-                onChange={(e) => setTeachingDepth(e.target.value)}
-                disabled={isLoading}
-              >
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
-            </div>
-          </div>
+             <div className="form-group">
+               <label htmlFor="teachingDepth">Teaching Depth</label>
+               <select
+                 id="teachingDepth"
+                 value={teachingDepth}
+                 onChange={(e) => setTeachingDepth(e.target.value)}
+                 disabled={isLoading}
+               >
+                 <option value="beginner">Beginner</option>
+                 <option value="intermediate">Intermediate</option>
+                 <option value="advanced">Advanced</option>
+               </select>
+             </div>
+           </div>
 
           <button type="submit" className="auth-button primary" disabled={isLoading}>
             {isLoading ? "Creating..." : "Start Lesson"}

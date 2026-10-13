@@ -10,8 +10,9 @@
 //   3. unless the teacher directed the camera this step, the camera is re-framed to the new content.
 import { clamp } from "../visual/geometry";
 import {
-  DEFAULT_CAMERA,
-  EMPTY_3D_MEMORY,
+   DEFAULT_CAMERA,
+   EMPTY_3D_MEMORY,
+   EMPTY_BOUNDS,
   FlowCurve,
   FlowShape,
   MAX_3D_ANNOTATIONS,
@@ -204,20 +205,22 @@ export function getVisual3DScene(scene: Visual3DScene): Visual3DScene {
       to: { ...annotation.to },
       points: annotation.points.map((point) => ({ ...point })),
     })),
-    camera: {
+     camera: {
       ...scene.camera,
-      position: { ...scene.camera.position },
-      target: { ...scene.camera.target },
-      follow: scene.camera.follow ? { ...scene.camera.follow } : undefined,
+      position: scene.camera?.position ? { ...scene.camera.position } : { ...DEFAULT_CAMERA.position },
+      target: scene.camera?.target ? { ...scene.camera.target } : { ...DEFAULT_CAMERA.target },
+      follow: scene.camera?.follow ? { ...scene.camera.follow } : undefined,
     },
-    memory: cloneMemory(scene.memory ?? emptyVisual3DMemory()),
-    bounds: {
-      min: { ...scene.bounds.min },
-      max: { ...scene.bounds.max },
-      center: { ...scene.bounds.center },
-      size: { ...scene.bounds.size },
-      radius: scene.bounds.radius,
-    },
+    memory: cloneMemory(scene.memory ?? EMPTY_3D_MEMORY),
+    bounds: scene.bounds
+      ? {
+          min: scene.bounds.min ? { ...scene.bounds.min } : { ...EMPTY_BOUNDS.min },
+          max: scene.bounds.max ? { ...scene.bounds.max } : { ...EMPTY_BOUNDS.max },
+          center: scene.bounds.center ? { ...scene.bounds.center } : { ...EMPTY_BOUNDS.center },
+          size: scene.bounds.size ? { ...scene.bounds.size } : { ...EMPTY_BOUNDS.size },
+          radius: scene.bounds.radius ?? 0,
+        }
+      : { ...EMPTY_BOUNDS, radius: 0 },
     ...(scene.lessonId ? { lessonId: scene.lessonId } : {}),
   };
 }

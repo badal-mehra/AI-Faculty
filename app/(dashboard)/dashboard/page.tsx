@@ -3,7 +3,12 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
-import LessonActions from "./dashboard/LessonActions";
+import LessonActions from "../dashboard/LessonActions";
+
+export const metadata = {
+  title: "Your Lessons",
+  description: "Your saved lessons and teaching sessions from AI Faculty.",
+};
 
 export default async function DashboardPage() {
   const user = await getUser();
@@ -24,7 +29,7 @@ export default async function DashboardPage() {
       created_at,
       updated_at,
       last_activity_at
-    `
+      `
     )
     .eq("user_id", user.id)
     .order("last_activity_at", { ascending: false })

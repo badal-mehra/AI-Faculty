@@ -3,6 +3,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ClassroomClient from "./ClassroomClient";
 
+export const metadata = {
+  title: "Classroom",
+  description: "Your interactive AI teaching session.",
+};
+
 export default async function ClassroomPage({
   params,
   searchParams,
