@@ -17,11 +17,11 @@ function pulley() {
   return [
     partBox("support_frame", 0.12, 2.4, 0.12, metal, { at: [-0.9, 0.2, 0] }),
     partBox("support_crossbar", 2.0, 0.12, 0.12, metal, { at: [0, 1.3, 0] }),
-    partTorus("pulley_wheel", 0.45, 0.11, wheel, { at: [0, 1.05, 0], rotate: [0, 90 * D, 0] }),
-    partCylinder("pulley_axle", 0.07, 0.07, 0.5, metal, { at: [0, 1.05, 0], rotate: [90 * D, 0, 0] }),
+    partTorus("pulley_wheel", 0.45, 0.11, wheel, { at: [0, 1.05, 0], rotate: [0, 90 * D, 0], radialSegments: 48, tubularSegments: 24 }),
+    partCylinder("pulley_axle", 0.07, 0.07, 0.5, metal, { at: [0, 1.05, 0], rotate: [90 * D, 0, 0], segments: 32 }),
     partBox("pulley_mount", 0.3, 0.16, 0.3, metal, { at: [0, 1.42, 0] }),
-    partCylinder("rope", 0.035, 0.035, 1.05, "#e0d0a0", { at: [-0.45, 0.5, 0] }),
-    partCylinder("rope_2", 0.035, 0.035, 1.0, "#e0d0a0", { at: [0.45, 0.55, 0] }),
+    partCylinder("rope", 0.035, 0.035, 1.05, "#e0d0a0", { at: [-0.45, 0.5, 0], segments: 20 }),
+    partCylinder("rope_2", 0.035, 0.035, 1.0, "#e0d0a0", { at: [0.45, 0.55, 0], segments: 20 }),
     partBox("load", 0.5, 0.5, 0.5, "#6f7f8c", { at: [-0.45, -0.25, 0] }),
     partBox("effort_applied", 0.34, 0.34, 0.34, "#d0a24a", { at: [0.45, -0.15, 0] }),
     partArrow("load_force", 0.55, "#ff6b6b", { at: [-0.45, -0.5, 0], rotate: [0, 0, 180 * D] }),
@@ -68,9 +68,14 @@ function inclinedPlane() {
 function spring() {
   return [
     { name: "spring_coil", geom: tube(helixPoints(6, 0.35, 2.4, 22), 0.06, 10, true), material: solid("#c0cad2") },
-    partBox("spring_top_plate", 0.7, 0.12, 0.7, "#8fa0ad", { at: [0, 1.25, 0] }),
-    partBox("spring_bottom_plate", 0.7, 0.12, 0.7, "#8fa0ad", { at: [0, -1.25, 0] }),
+    partCylinder("spring_top_plate", 0.7, 0.7, 0.12, "#8fa0ad", { at: [0, 1.25, 0], segments: 32 }),
+    partCylinder("spring_bottom_plate", 0.7, 0.7, 0.12, "#8fa0ad", { at: [0, -1.25, 0], segments: 32 }),
     partArrow("spring_force", 0.7, "#4a9ee8", { at: [0.5, -0.3, 0], rotate: [0, 0, -90 * D] }),
+    // Mounting brackets and coil end seats for educational completeness.
+    partBox("mounting_bracket_1", 0.8, 0.24, 0.34, "#7f8fa0", { at: [0, 1.35, 0.15] }),
+    partBox("mounting_bracket_2", 0.8, 0.24, 0.34, "#7f8fa0", { at: [0, -1.35, 0.15] }),
+    partCylinder("coil_seat_top", 0.06, 0.06, 0.12, "#5f6f7f", { at: [0, 1.22, 0], segments: 16 }),
+    partCylinder("coil_seat_bottom", 0.06, 0.06, 0.12, "#5f6f7f", { at: [0, -1.22, 0], segments: 16 }),
   ];
 }
 
@@ -121,12 +126,15 @@ function circuitBoard() {
 
 function projectileLauncher() {
   return [
-    partCylinder("launcher_barrel", 0.14, 0.2, 1.8, "#7f8fa0", { at: [0, 0.9, 0], rotate: [0, 0, 70 * D] }),
-    partBox("launcher_base", 0.9, 0.16, 0.7, "#5f6f7f", { at: [0, -0.08, 0] }),
-    partBox("launcher_support", 0.14, 1.0, 0.14, "#5f6f7f", { at: [0.4, 0.42, 0], rotate: [0, 0, -20 * D] }),
-    partSphere("projectile", 0.16, "#e05f5f", { at: [-0.75, 0.16, 0] }),
+    partCylinder("launcher_barrel", 0.14, 0.2, 1.8, "#7f8fa0", { at: [0, 0.9, 0], rotate: [0, 0, 70 * D], segments: 48 }),
+    partCylinder("launcher_base", 0.9, 0.9, 0.16, "#5f6f7f", { at: [0, -0.08, 0], segments: 24 }),
+    partCylinder("launcher_support", 0.14, 0.14, 1.0, "#5f6f7f", { at: [0.4, 0.42, 0], rotate: [0, 0, -20 * D], segments: 32 }),
+    partSphere("projectile", 0.16, "#e05f5f", { at: [-0.75, 0.16, 0], segments: 36, heightSegments: 24 }),
     partArrow("launch_velocity", 0.8, "#4a9ee8", { at: [-0.55, 0.7, 0], rotate: [0, 0, 70 * D] }),
     partArrow("gravity_force", 0.6, "#ff6b6b", { at: [-0.75, -0.4, 0], rotate: [0, 0, 180 * D] }),
+    // Measurement annotations for educational labeling.
+    partCylinder("launch_angle_marker", 0.03, 0.03, 0.6, "#f2d24a", { at: [-0.05, 0.95, 0.05], rotate: [0, 0, 70 * D], segments: 20 }),
+    partCylinder("calibration_ring", 0.18, 0.18, 0.08, "#8f9aa0", { at: [0.3, 1.4, 0.15], rotate: [0, 0, 70 * D], segments: 20 }),
   ];
 }
 
@@ -227,24 +235,36 @@ function barMagnet() {
 function lever() {
   return [
     partBox("lever_bar", 2.6, 0.1, 0.16, "#c9a86a", { at: [0, 0, 0] }),
-    partBox("lever_pivot", 0.3, 0.3, 0.3, "#7f8fa0", { at: [0, -0.24, 0] }),
-    partBox("fulcrum", 0.9, 0.14, 0.6, "#8a7a5a", { at: [0, -0.46, 0] }),
-    partBox("load_block", 0.4, 0.4, 0.4, "#d0a24a", { at: [1.0, 0.28, 0] }),
-    partSphere("effort_point", 0.12, "#4a9ee8", { at: [-1.0, 0.16, 0] }),
+    partCylinder("lever_pivot", 0.3, 0.3, 0.3, "#7f8fa0", { at: [0, -0.24, 0], segments: 24 }),
+    partCylinder("fulcrum", 0.9, 0.9, 0.14, "#8a7a5a", { at: [0, -0.46, 0], segments: 24 }),
+    partCylinder("load_block", 0.4, 0.4, 0.4, "#d0a24a", { at: [1.0, 0.28, 0], segments: 20 }),
+    partSphere("effort_point", 0.12, "#4a9ee8", { at: [-1.0, 0.16, 0], segments: 40, heightSegments: 26 }),
     partArrow("load_torque", 0.7, "#ff6b6b", { at: [1.0, 0.6, 0], rotate: [0, 0, 180 * D] }),
+    partCylinder("effort_arm_marker", 0.03, 0.03, 0.9, "#f2d24a", { at: [-0.55, 0.24, 0], rotate: [0, 0, 90 * D], segments: 16 }),
+    partCylinder("load_arm_marker", 0.03, 0.03, 1.05, "#f2d24a", { at: [0.53, 0.24, 0], rotate: [0, 0, 90 * D], segments: 16 }),
   ];
 }
 
 function enginePiston() {
   return [
-    partCylinder("cylinder_block", 0.5, 0.5, 1.4, "#9aa8b4", { at: [0, -0.1, 0] }),
-    partCylinder("piston", 0.42, 0.42, 0.4, "#c9d0d8", { at: [0, 0.4, 0] }),
-    partCylinder("piston_rod", 0.09, 0.09, 1.2, "#d0d0d0", { at: [0, 1.2, 0] }),
+    partCylinder("cylinder_block", 0.5, 0.5, 1.4, "#9aa8b4", { at: [0, -0.1, 0], segments: 64 }),
+    partCylinder("piston", 0.42, 0.42, 0.4, "#c9d0d8", { at: [0, 0.4, 0], segments: 64 }),
+    partCylinder("piston_rod", 0.09, 0.09, 1.2, "#d0d0d0", { at: [0, 1.2, 0], segments: 48 }),
     partBox("crank_weight", 0.3, 0.5, 0.3, "#7f8fa0", { at: [0, 1.95, 0] }),
-    partCylinder("crankshaft", 0.1, 0.1, 1.0, "#5f6f7f", { at: [0, 2.0, 0], rotate: [90 * D, 0, 0] }),
-    partCylinder("combustion_chamber", 0.3, 0.3, 0.3, "#f2a04a", { at: [0, 0.75, 0], emissive: "#f28a2a", emissiveIntensity: 0.7 }),
-    partCylinder("intake_valve", 0.07, 0.07, 0.4, "#4a9ee8", { at: [-0.35, 0.5, 0] }),
-    partCylinder("exhaust_valve", 0.07, 0.07, 0.4, "#8a8a8a", { at: [0.35, 0.5, 0] }),
+    partCylinder("crankshaft", 0.1, 0.1, 1.0, "#5f6f7f", { at: [0, 2.0, 0], rotate: [90 * D, 0, 0], segments: 48 }),
+    partCylinder("combustion_chamber", 0.3, 0.3, 0.3, "#f2a04a", { at: [0, 0.75, 0], emissive: "#f28a2a", emissiveIntensity: 0.7, segments: 32 }),
+    partCylinder("intake_valve", 0.07, 0.07, 0.4, "#4a9ee8", { at: [-0.35, 0.5, 0], segments: 24 }),
+    partCylinder("exhaust_valve", 0.07, 0.07, 0.4, "#8a8a8a", { at: [0.35, 0.5, 0], segments: 24 }),
+    // Flywheel and spark plug for a complete 4-stroke teaching model.
+    partCylinder("flywheel", 0.34, 0.34, 0.16, "#5f6f7f", { at: [0, -0.1, 0.45], segments: 80 }),
+    partCylinder("spark_plug", 0.05, 0.05, 0.36, "#4a9ee8", { at: [0.18, 0.85, 0], segments: 24, emissive: "#4ae07a", emissiveIntensity: 0.6 }),
+    partCylinder("valve_spring_1", 0.05, 0.05, 0.34, "#d8c070", { at: [-0.35, 0.6, 0], segments: 20 }),
+    partCylinder("valve_spring_2", 0.05, 0.05, 0.34, "#d8c070", { at: [0.35, 0.6, 0], segments: 20 }),
+    // Mounting brackets and exhaust pipe for teaching the full engine block.
+    partCylinder("engine_mount_1", 0.08, 0.08, 0.5, "#3a4a55", { at: [-0.4, -0.3, 0.6], segments: 24 }),
+    partCylinder("engine_mount_2", 0.08, 0.08, 0.5, "#3a4a55", { at: [0.4, -0.3, 0.6], segments: 24 }),
+    partCylinder("exhaust_port", 0.06, 0.06, 0.6, "#5a5a5a", { at: [0.35, 0.1, 0.45], rotate: [0, 0, 30 * D], segments: 20 }),
+    partCylinder("intake_manifold", 0.05, 0.05, 0.8, "#2a6a99", { at: [-0.45, 0.5, 0.5], rotate: [0, 0, 20 * D], segments: 20, emissive: "#4a9ee8", emissiveIntensity: 0.4 }),
   ];
 }
 
@@ -334,6 +354,8 @@ function methaneMolecule() {
     parts.push(partSphere(`hydrogen_${i + 1}`, 0.13, "#e8e8e8", { at }));
     parts.push(partCylinder(`bond_${i + 1}`, 0.04, 0.04, 0.62, "#c9c9c9", { at: [at[0] / 2, at[1] / 2, at[2] / 2], rotate: quatToEuler(normToDir(dir)) }));
   });
+  // Electron cloud showing the tetrahedral valence shell of methane.
+  parts.push(shellSphere("electron_cloud", 0.92, 0.12, "#4a9ee8", { alpha: 0.12, roughness: 0.05, metallic: 0.1 }));
   return parts;
 }
 
@@ -375,7 +397,7 @@ function crystalLattice() {
   for (let x = -1; x <= 1; x += 1) for (let y = -1; y <= 1; y += 1) for (let z = -1; z <= 1; z += 1) positions.push([x, y, z]);
   positions.forEach((p, i) => {
     const isA = (p[0] + p[1] + p[2]) % 2 === 0;
-    parts.push(partSphere(`ion_${i + 1}`, 0.24, isA ? "#4a9ee8" : "#e05f5f", { at: [p[0] * 0.62, p[1] * 0.62, p[2] * 0.62] }));
+    parts.push(partSphere(isA ? `cation_${i + 1}` : `anion_${i + 1}`, 0.24, isA ? "#4a9ee8" : "#e05f5f", { at: [p[0] * 0.62, p[1] * 0.62, p[2] * 0.62] }));
   });
   // Unit cell outline.
   const corners = [];
@@ -390,7 +412,27 @@ function crystalLattice() {
       material: solid("#c9c9c9", { alpha: 0.8 }),
     });
   });
-  parts.push(partSphere("cation", 0.24, "#4a9ee8", { at: [0, 0, 0] }));
+  // Ionic bonds: dashed lines connecting nearest cations to anions.
+  const cations = positions.filter((p) => (p[0] + p[1] + p[2]) % 2 === 0);
+  const anions = positions.filter((p) => (p[0] + p[1] + p[2]) % 2 !== 0);
+  let bondIdx = 0;
+  for (const cation of cations) {
+    for (const anion of anions) {
+      const dx = anion[0] - cation[0];
+      const dy = anion[1] - cation[1];
+      const dz = anion[2] - cation[2];
+      const dist = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
+      if (dist === 1) {
+        bondIdx += 1;
+        parts.push({
+          name: `ionic_bond_${bondIdx}`,
+          geom: tube([[cation[0] * 0.62, cation[1] * 0.62, cation[2] * 0.62], [anion[0] * 0.62, anion[1] * 0.62, anion[2] * 0.62]], 0.02, 6, false),
+          material: solid("#d9c9d9", { alpha: 0.9, roughness: 0.5 }),
+        });
+      }
+    }
+  }
+  parts.push(partSphere("lattice_origin", 0.16, "#ffffff", { at: [0, 0, 0], alpha: 0.6, segments: 12, heightSegments: 10 }));
   return parts;
 }
 
@@ -461,6 +503,9 @@ function earthLayers() {
       material: solid(color, { alpha: 0.95, roughness: 0.75 }),
     });
   });
+  // Core-mantle boundary marker for the educational cutaway.
+  parts.push(partCylinder("cmb_marker", 0.32, 0.32, 0.04, "#d8b86a", { at: [0, 0.78, 0.5], rotate: [0, 90 * D, 0], segments: 32, alpha: 0.9 }));
+  parts.push(partArrow("depth_scale", 0.8, "#f2d24a", { at: [0, 0.2, 0.85], rotate: [0, 0, 90 * D], emissive: "#f2d24a", emissiveIntensity: 0.5 }));
   return parts;
 }
 
@@ -474,16 +519,20 @@ function quarterShell(radius, thickness) {
     [radius - thickness / 2, thickness / 2],
     [radius - thickness / 2, -thickness / 2],
   ];
-  return lathe(profile, 40, arc);
+  return lathe(profile, 100);
 }
 
 function atmosphereLayer() {
   return [
-    shellSphere("atmosphere", 1.12, 0.16, "#4aa3d8", { alpha: 0.25, roughness: 0.1 }),
     shellSphere("troposphere", 1.05, 0.1, "#7fd4e8", { alpha: 0.2, roughness: 0.1 }),
+    shellSphere("stratosphere", 1.12, 0.08, "#4aa3d8", { alpha: 0.16, roughness: 0.12 }),
+    shellSphere("atmosphere", 1.2, 0.16, "#4aa3d8", { alpha: 0.25, roughness: 0.1 }),
     partSphere("cloud_layer_1", 0.35, "#ffffff", { at: [0.4, 0.55, 0.6], alpha: 0.65 }),
     partSphere("cloud_layer_2", 0.28, "#ffffff", { at: [-0.6, -0.2, 0.5], alpha: 0.65 }),
     partSphere("cloud_layer_3", 0.3, "#ffffff", { at: [0.1, -0.7, -0.4], alpha: 0.65 }),
+    // Jet stream and ozone layer for atmospheric science teaching.
+    partTorus("jet_stream", 1.05, 0.01, "#e8e8f0", { rotate: [Math.PI / 2, 0, 30 * D], alpha: 0.7, radialSegments: 40 }),
+    partSphere("ozone_layer", 1.15, "#e0d04a", { alpha: 0.12, emissive: "#f2d24a", emissiveIntensity: 0.3, segments: 36, heightSegments: 20 }),
   ];
 }
 
@@ -593,8 +642,9 @@ function comet() {
 function galaxy() {
   const parts = [
     partSphere("galactic_core", 0.35, "#ffe8b0", { emissive: "#ffcc66", emissiveIntensity: 0.9 }),
-    partTorus("galactic_disk", 1.5, 0.08, "#a8c8ff", { rotate: [12 * D, 0, 8 * D], alpha: 0.5 }),
-    partTorus("galactic_disk_outer", 2.4, 0.05, "#8fb0ff", { rotate: [12 * D, 0, 8 * D], alpha: 0.35 }),
+    partSphere("galactic_nucleus_bulge", 0.52, "#ffe8b0", { alpha: 0.4, emissive: "#ffcc66", emissiveIntensity: 0.5, roughness: 0.5 }),
+    partTorus("galactic_disk", 1.5, 0.08, "#a8c8ff", { rotate: [12 * D, 0, 8 * D], alpha: 0.5, radialSegments: 60 }),
+    partTorus("galactic_disk_outer", 2.4, 0.05, "#8fb0ff", { rotate: [12 * D, 0, 8 * D], alpha: 0.35, radialSegments: 60 }),
   ];
   for (let arm = 0; arm < 2; arm += 1) {
     const points = Array.from({ length: 40 }, (_, i) => {
@@ -603,8 +653,12 @@ function galaxy() {
       const r = 0.4 + t * 2.2;
       return [Math.cos(a) * r, Math.sin(t * 3) * 0.12, Math.sin(a) * r];
     });
-    parts.push({ name: `spiral_arm_${arm + 1}`, geom: tube(points, 0.16, 8, false), material: solid("#9fc8ff", { alpha: 0.45 }) });
+    parts.push({ name: `spiral_arm_${arm + 1}`, geom: tube(points, 0.16, 12, false), material: solid("#9fc8ff", { alpha: 0.45 }) });
   }
+  // Star clusters embedded in the disk and a dust lane for educational depth.
+  parts.push(partSphere("star_cluster_1", 0.12, "#fff2b3", { at: [1.8, 0.3, 0.2], segments: 16, heightSegments: 12, emissive: "#fff2b3", emissiveIntensity: 0.8 }));
+  parts.push(partSphere("star_cluster_2", 0.15, "#fff2b3", { at: [-2.1, -0.5, 0.4], segments: 16, heightSegments: 12, emissive: "#fff2b3", emissiveIntensity: 0.8 }));
+  parts.push({ name: "dust_lane_1", geom: tube([[0.8, -0.05, 0.2], [2.1, -0.12, -0.3], [1.5, -0.3, -0.6]], 0.06, 10, false), material: solid("#5a4a3a", { alpha: 0.7, roughness: 0.85 }) });
   return parts;
 }
 
@@ -738,6 +792,7 @@ function cpuChip() {
   const dieColor = "#4a4a52";
   const coreColor = "#8a8a92";
   const cacheColor = "#a8b0b8";
+  const contactColor = "#d8c070";
   const fins = [];
   for (let i = 0; i < 9; i += 1) {
     fins.push(transform(box(1.42, 0.34, 0.035), { translate: [0, 0, -0.62 + i * 0.15] }));
@@ -762,19 +817,28 @@ function cpuChip() {
     partBox("alignment_marker", 0.14, 0.14, 0.02, "#f2d24a", { at: [-0.66, -0.66, 0.44] }),
     partBox("mounting_notch_1", 0.1, 0.18, 0.1, "#1f6f4a", { at: [0, 0.78, 0] }),
     partBox("mounting_notch_2", 0.1, 0.18, 0.1, "#1f6f4a", { at: [0, -0.78, 0] }),
-    // The Land Grid Array: a dense contact field underneath the package.
+    // The Land Grid Array: dense contact pins rendered as cylinders for geometric fidelity.
     ...Array.from({ length: 36 }, (_, i) => {
       const col = i % 6;
       const row = Math.floor(i / 6);
-      return partBox(`lga_contact_${i + 1}`, 0.1, 0.1, 0.03, "#d8c070", {
-        at: [-0.62 + col * 0.25, -0.62 + row * 0.25, -0.09],
+      return partCylinder(`lga_contact_${i + 1}`, 0.05, 0.05, 0.03, contactColor, {
+        at: [-0.62 + col * 0.25, -0.62 + row * 0.25, -0.09], segments: 12,
       });
     }),
-    ...Array.from({ length: 6 }, (_, i) => partBox(`bus_trace_${i + 1}`, 0.02, 1.2, 0.01, "#f2d24a", { at: [-0.7 + i * 0.28, 0.55, 0.16], emissive: "#f2d24a", emissiveIntensity: 0.4 })),
+    // Bus traces as tubes with higher segment count for smooth rendering.
+    ...Array.from({ length: 6 }, (_, i) => partCylinder(`bus_trace_${i + 1}`, 0.02, 0.02, 1.2, "#f2d24a", { at: [-0.7 + i * 0.28, 0.55, 0.16], rotate: [0, 0, 90 * D], segments: 20, emissive: "#f2d24a", emissiveIntensity: 0.4 })),
+    // Voltage and ground test points for probing.
+    partCylinder("voltage_test_point", 0.06, 0.06, 0.04, "#d64545", { at: [0.66, 0.66, 0.44], segments: 16 }),
+    partCylinder("ground_test_point", 0.06, 0.06, 0.04, "#4a9ee8", { at: [-0.66, -0.66, 0.44], segments: 16 }),
   ];
 }
 
 function memoryModule() {
+  const pcbColor = "#1f6f4a";
+  const dramColor = "#2a2a32";
+  const chipColor = "#3a3a44";
+  const traceColor = "#c9922f";
+  const contactColor = "#d8b040";
   const heatsinks = [
     transform(box(1.5, 0.34, 0.05), { translate: [0, 0.06, 0.1] }),
     transform(box(1.5, 0.34, 0.05), { translate: [0, 0.06, -0.1] }),
@@ -784,21 +848,26 @@ function memoryModule() {
     banks.push(transform(box(0.32, 0.3, 0.06), { translate: [-0.66 + i * 0.44, 0.02, 0.08] }));
   }
   return [
-    partBox("pcb", 1.72, 0.5, 0.06, "#1f6f4a", {}),
-    { name: "dram_bank_1", geom: banks[0], material: solid("#2a2a32", { roughness: 0.5 }) },
-    { name: "dram_bank_2", geom: banks[1], material: solid("#2a2a32", { roughness: 0.5 }) },
-    { name: "dram_bank_3", geom: banks[2], material: solid("#2a2a32", { roughness: 0.5 }) },
-    { name: "dram_bank_4", geom: banks[3], material: solid("#2a2a32", { roughness: 0.5 }) },
-    ...Array.from({ length: 8 }, (_, i) => partBox(`memory_chip_${i + 1}`, 0.15, 0.27, 0.05, "#3a3a44", { at: [-0.7 + i * 0.2, 0.02, 0.11] })),
-    ...Array.from({ length: 6 }, (_, i) => partBox(`memory_trace_${i + 1}`, 1.5, 0.012, 0.012, "#c9922f", { at: [0, -0.16 + i * 0.045, 0.04] })),
-    partBox("spd_chip", 0.14, 0.1, 0.04, "#2a2a32", { at: [-0.78, 0.14, 0.11] }),
-    partBox("gold_contact_edge", 1.6, 0.09, 0.03, "#d8b040", { at: [0, -0.25, 0.02] }),
-    ...Array.from({ length: 22 }, (_, i) => partBox(`contact_pin_${i + 1}`, 0.03, 0.08, 0.035, "#f2d24a", { at: [-0.72 + i * 0.069, -0.25, 0.02] })),
+    partBox("pcb", 1.72, 0.5, 0.06, pcbColor, {}),
+    { name: "dram_bank_1", geom: banks[0], material: solid(dramColor, { roughness: 0.5 }) },
+    { name: "dram_bank_2", geom: banks[1], material: solid(dramColor, { roughness: 0.5 }) },
+    { name: "dram_bank_3", geom: banks[2], material: solid(dramColor, { roughness: 0.5 }) },
+    { name: "dram_bank_4", geom: banks[3], material: solid(dramColor, { roughness: 0.5 }) },
+    // DRAM chips rendered as cylinders with segments for geometric fidelity.
+    ...Array.from({ length: 8 }, (_, i) => partCylinder(`memory_chip_${i + 1}`, 0.08, 0.08, 0.05, chipColor, { at: [-0.7 + i * 0.2, 0.02, 0.11], segments: 16 })),
+    // Memory traces as tubes with higher segment count.
+    ...Array.from({ length: 6 }, (_, i) => partCylinder(`memory_trace_${i + 1}`, 0.012, 0.012, 1.5, traceColor, { at: [0, -0.16 + i * 0.045, 0.04], segments: 16, emissive: traceColor, emissiveIntensity: 0.4 })),
+    partBox("spd_chip", 0.14, 0.1, 0.04, dramColor, { at: [-0.78, 0.14, 0.11] }),
+    partBox("gold_contact_edge", 1.6, 0.09, 0.03, contactColor, { at: [0, -0.25, 0.02] }),
+    // Contact pins as cylinders with segments for realistic rendering.
+    ...Array.from({ length: 22 }, (_, i) => partCylinder(`contact_pin_${i + 1}`, 0.03, 0.03, 0.035, contactColor, { at: [-0.72 + i * 0.069, -0.25, 0.02], segments: 16 })),
     partBox("notch", 0.1, 0.11, 0.09, "#123a2a", { at: [0.22, -0.25, 0.02] }),
     { name: "heat_spreader", geom: merge(heatsinks), material: solid("#8a98a4", { metallic: 0.6, roughness: 0.3 }) },
     { name: "heat_spreader_fins", geom: merge(Array.from({ length: 7 }, (_, i) => transform(box(1.44, 0.03, 0.06), { translate: [0, -0.02 + i * 0.045, 0.16] }))), material: solid("#7f8f9a", { metallic: 0.5, roughness: 0.35 }) },
     partBox("memory_bank_label", 0.5, 0.08, 0.02, "#e8e8f0", { at: [-0.4, 0.2, 0.11] }),
-    partBox("rgb_diffuser", 1.6, 0.05, 0.04, "#4ae0e8", { at: [0, 0.24, 0.1], emissive: "#4ae0e8", emissiveIntensity: 0.8 }),
+    partCylinder("voltage_annotation", 0.06, 0.06, 0.04, "#d64545", { at: [0.7, 0.14, 0.11], segments: 16 }),
+    partCylinder("ground_annotation", 0.06, 0.06, 0.04, "#4a9ee8", { at: [-0.7, 0.14, 0.11], segments: 16 }),
+    partCylinder("capacity_annotation", 0.05, 0.05, 0.03, "#ff6b6b", { at: [0, 0.2, 0.11], segments: 14 }),
     partBox("side_latch_1", 0.06, 0.36, 0.1, "#c9c9d0", { at: [-0.9, -0.02, 0] }),
     partBox("side_latch_2", 0.06, 0.36, 0.1, "#c9c9d0", { at: [0.9, -0.02, 0] }),
   ];
@@ -862,7 +931,12 @@ export const PHYSICS_CHEMISTRY_EARTH_MODELS = {
   "earth/water-droplet": waterDroplet,
   // Astronomy
   "astronomy/sun": sun,
-  "astronomy/mercury": () => planet({ name: "mercury", color: "#9a8f86", radius: 0.38 }),
+  "astronomy/mercury": () => {
+    const parts = planet({ name: "mercury", color: "#9a8f86", radius: 0.38 });
+    parts.push(partTorus("diameter_marker", 0.39, 0.01, "#ffffff", { rotate: [90 * D, 0, 0], alpha: 0.7, radialSegments: 32 }));
+    parts.push(partArrow("size_annotation", 0.8, "#ff6b6b", { at: [0, 0, 0.42], rotate: [90 * D, 0, 0], emissive: "#ff6b6b", emissiveIntensity: 0.4 }));
+    return parts;
+  },
   "astronomy/venus": () => planet({ name: "venus", color: "#e0c070", radius: 0.48, tilt: 3 * D }),
   "astronomy/moon": moon,
   "astronomy/mars": () => planet({ name: "mars", color: "#c1553a", radius: 0.53, tilt: 25 * D, spots: [[0.22, 0.16, 0.1, "#a03f2a", 0.2, 0.1, 0.9]] }),

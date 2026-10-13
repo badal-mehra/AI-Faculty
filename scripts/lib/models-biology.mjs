@@ -275,6 +275,9 @@ function skeleton() {
   }
   parts.push(partBox("sternum", 0.12, 0.72, 0.06, bone, { at: [0, 1.32, 0.28] }));
   parts.push(partBox("pelvis", 0.86, 0.34, 0.42, bone, { at: [0, 0.72, 0] }));
+  // Dental and oral anatomy in the skull for educational completeness.
+  parts.push(...Array.from({ length: 8 }, (_, i) => partSphere(`tooth_${i + 1}`, 0.05, "#f2e0c0", { at: [-0.2 + i * 0.055, 2.28, 0.22] })));
+  parts.push(partSphere("tongue", 0.18, "#d64545", { at: [0, 2.1, 0.1] }));
   // Limbs.
   for (const side of [-1, 1]) {
     const tag = side < 0 ? "left" : "right";
@@ -538,6 +541,8 @@ function chloroplast() {
     partCylinder("granum_2a", 0.26, 0.26, 0.08, "#3f8f3a", { at: [0.05, -0.14, 0.04], rotate: [0, 0, 40 * D] }),
     partCylinder("granum_2b", 0.22, 0.22, 0.08, "#3f8f3a", { at: [0.05, -0.26, 0.04], rotate: [0, 0, 40 * D] }),
     partTorus("thylakoid", 0.42, 0.04, "#8fd07a", { at: [0, -0.05, 0] }),
+    // Stroma: the fluid-filled space surrounding the grana where the Calvin cycle occurs.
+    shellSphere("stroma", 0.54, 0.08, "#8fd07a", { alpha: 0.35, roughness: 0.4 }),
   ];
 }
 
@@ -549,6 +554,8 @@ function enzyme() {
     lump("substrate_binding", 0.3, 0.28, 0.28, "#4f9ec0", { at: [0.4, -0.2, -0.2], wobble: 0.1, seed: 89 }),
     partSphere("substrate", 0.22, "#f2a04a", { at: [0, -0.28, 0], alpha: 0.95 }),
     partSphere("active_site", 0.14, "#f7e08a", { at: [0, -0.28, 0] }),
+    // Cofactor: a metal ion (zinc) essential for catalytic activity.
+    partSphere("cofactor", 0.08, "#e0c070", { at: [-0.1, -0.32, -0.05], emissive: "#ffd700", emissiveIntensity: 0.8, segments: 14 }),
   ];
 }
 
